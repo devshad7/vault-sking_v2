@@ -1,0 +1,34 @@
+export const navData = [
+  { title: "Home", href: "/" },
+  { title: "Shop", href: "/shop" },
+  { title: "Blog", href: "/blog" },
+  { title: "Hot Deals", href: "/deal" },
+];
+export const quickLinksData = [
+  { title: "About us", href: "/about" },
+  { title: "Contact us", href: "/contact" },
+  { title: "Terms & Conditions", href: "/terms" },
+  { title: "Privacy Policy", href: "/privacy" },
+    {title: "Contact", href: "/contact"},
+  { title: "Help", href: "/help" },
+];
+export const categoriesData = [
+  { title: "Cleansers", href: "cleansers" },
+  { title: "Moisturizers", href: "moisturizers" },
+  { title: "Serums", href: "serums" },
+  { title: "Sunscreens", href: "sunscreens" },
+  { title: "Face Masks", href: "face-masks" },
+  { title: "Toners", href: "toners" },
+  { title: "Eye Care", href: "eye-care" },
+];
+
+export const productCategories = [
+  { title: "All", value: "all" },
+  { title: "Serum", value: "serum" },
+  { title: "Face Wash", value: "face-wash" },
+  { title: "Moisturizer", value: "moisturizer" },
+  { title: "Sunscreen and Sunstick", value: "sunscreen-and-sunstick" },
+  { title: "Face Mask", value: "face-mask" },
+  { title: "Lip Balm", value: "lip-balm" },
+  { title: "Others", value: "others" },
+]

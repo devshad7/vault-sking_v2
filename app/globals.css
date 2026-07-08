@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+/* ================= DESIGN TOKENS ================= */
+@theme {
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+  /* Brand Colors */
+  --color-primary: #1f3640;
+  /* Deep premium navy-teal */
+  --color-secondary: #d7e3ea;
+  /* Soft blue-gray */
+  --color-accent: #4ea7d8;
+  /* Logo blue */
+
+  /* Surfaces */
+  --color-bg: #f7f5f2;
+  /* Warm luxury background */
+  --color-surface: #ffffff;
+  /* Clean cards/products */
+
+  /* Typography */
+  --color-text: #1f2933;
+  /* Strong readable text */
+  --color-text-muted: #667788;
+  /* Secondary text */
+
+  /* Feedback */
+  --color-success: #3d7a5c;
+  --color-warning: #c78a3b;
+  --color-error: #c65a5a;
+  --color-info: #4ea7d8;
+
+  /* Borders */
+  --color-border: #dde3e8;
+
+}
+
+/* ================= BASE RESET ================= */
+@layer base {
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    overflow-x: hidden;
+    max-width: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-bg);
+    color: var(--color-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.6;
+  }
+
+  /* Prevent any element from causing horizontal overflow */
+  img,
+  video,
+  iframe {
+    max-width: 100%;
+  }
+
+  /* ================= UTILITIES ================= */
+  .hoverEffect {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  /* Minimum 44px touch target */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+}
