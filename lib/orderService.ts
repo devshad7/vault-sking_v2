@@ -1,11 +1,16 @@
 "use client";
 
 import {
+  type DocumentData,
   Timestamp,
   collection,
   doc,
+  getDoc,
+  getDocs,
+  query,
   runTransaction,
   serverTimestamp,
+  where,
 } from "firebase/firestore";
 
 import { db } from "@/config/firebase.config";
@@ -37,6 +42,59 @@ export interface OrderItem {
   sku: string;
 }
 
+export const customerOrderStatuses = [
+  "pending",
+  "confirmed",
+  "processing",
+  "shipped",
+  "delivered",
+  "cancelled",
+] as const;
+
+export type CustomerOrderStatus = (typeof customerOrderStatuses)[number];
+
+export interface OrderTimelineEntry {
+  status: CustomerOrderStatus;
+
+  note: string;
+
+  at: Timestamp | null;
+}
+
+export interface CustomerOrder {
+  id: string;
+
+  orderNumber: string;
+
+  userId: string;
+
+  status: CustomerOrderStatus;
+
+  customer: Pick<ShippingAddress, "fullName" | "phone" | "email">;
+
+  shippingAddress: ShippingAddress;
+
+  payment: {
+    method: "cash";
+    verified: boolean;
+  };
+
+  totals: {
+    subtotal: number;
+    discount: number;
+    shipping: number;
+    total: number;
+  };
+
+  items: OrderItem[];
+
+  timeline: OrderTimelineEntry[];
+
+  createdAt: Timestamp | null;
+
+  updatedAt: Timestamp | null;
+}
+
 export interface PlaceOrderInput {
   userId: string;
 
@@ -46,6 +104,186 @@ export interface PlaceOrderInput {
 
   items: OrderItem[];
 }
+
+const cancelableOrderStatuses: CustomerOrderStatus[] = [
+  "pending",
+  "confirmed",
+  "processing",
+];
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const stringValue = (value: unknown, fallback = "") =>
+  typeof value === "string" ? value : fallback;
+
+const numberValue = (value: unknown) =>
+  typeof value === "number" && Number.isFinite(value) ? value : 0;
+
+const timestampValue = (value: unknown): Timestamp | null =>
+  value instanceof Timestamp ? value : null;
+
+const isCustomerOrderStatus = (
+  value: unknown,
+): value is CustomerOrderStatus =>
+  typeof value === "string" &&
+  customerOrderStatuses.includes(value as CustomerOrderStatus);
+
+const normalizeOrderItem = (value: unknown): OrderItem | null => {
+  if (!isRecord(value)) return null;
+
+  return {
+    productId: stringValue(value.productId),
+    title: stringValue(value.title),
+    thumbnail: stringValue(value.thumbnail),
+    price: numberValue(value.price),
+    discount: numberValue(value.discount),
+    quantity: numberValue(value.quantity),
+    sku: stringValue(value.sku),
+  };
+};
+
+const normalizeTimelineEntry = (value: unknown): OrderTimelineEntry | null => {
+  if (!isRecord(value)) return null;
+
+  return {
+    status: isCustomerOrderStatus(value.status) ? value.status : "pending",
+    note: stringValue(value.note),
+    at: timestampValue(value.at),
+  };
+};
+
+const toCustomerOrder = (id: string, data: DocumentData): CustomerOrder => {
+  const customer = isRecord(data.customer) ? data.customer : {};
+  const shippingAddress = isRecord(data.shippingAddress)
+    ? data.shippingAddress
+    : {};
+  const payment = isRecord(data.payment) ? data.payment : {};
+  const totals = isRecord(data.totals) ? data.totals : {};
+
+  return {
+    id,
+    orderNumber: stringValue(data.orderNumber, id),
+    userId: stringValue(data.userId),
+    status: isCustomerOrderStatus(data.status) ? data.status : "pending",
+    customer: {
+      fullName: stringValue(customer.fullName),
+      phone: stringValue(customer.phone),
+      email: stringValue(customer.email),
+    },
+    shippingAddress: {
+      fullName: stringValue(shippingAddress.fullName),
+      phone: stringValue(shippingAddress.phone),
+      email: stringValue(shippingAddress.email),
+      address: stringValue(shippingAddress.address),
+      city: stringValue(shippingAddress.city),
+      district: stringValue(shippingAddress.district),
+      zipCode: stringValue(shippingAddress.zipCode),
+    },
+    payment: {
+      method: "cash",
+      verified: payment.verified === true,
+    },
+    totals: {
+      subtotal: numberValue(totals.subtotal),
+      discount: numberValue(totals.discount),
+      shipping: numberValue(totals.shipping),
+      total: numberValue(totals.total),
+    },
+    items: Array.isArray(data.items)
+      ? data.items
+          .map(normalizeOrderItem)
+          .filter((item): item is OrderItem => item !== null)
+      : [],
+    timeline: Array.isArray(data.timeline)
+      ? data.timeline
+          .map(normalizeTimelineEntry)
+          .filter((entry): entry is OrderTimelineEntry => entry !== null)
+      : [],
+    createdAt: timestampValue(data.createdAt),
+    updatedAt: timestampValue(data.updatedAt),
+  };
+};
+
+export const canCustomerCancelOrder = (status: CustomerOrderStatus) =>
+  cancelableOrderStatuses.includes(status);
+
+export const getCustomerOrders = async (
+  userId: string,
+): Promise<CustomerOrder[]> => {
+  const ordersSnapshot = await getDocs(
+    query(collection(db, "orders"), where("userId", "==", userId)),
+  );
+
+  return ordersSnapshot.docs
+    .map((order) => toCustomerOrder(order.id, order.data()))
+    .sort(
+      (first, second) =>
+        (second.createdAt?.toMillis() ?? 0) -
+        (first.createdAt?.toMillis() ?? 0),
+    );
+};
+
+export const getCustomerOrder = async (
+  orderId: string,
+  userId: string,
+): Promise<CustomerOrder | null> => {
+  const orderSnapshot = await getDoc(doc(db, "orders", orderId));
+
+  if (!orderSnapshot.exists()) return null;
+
+  const order = toCustomerOrder(orderSnapshot.id, orderSnapshot.data());
+
+  return order.userId === userId ? order : null;
+};
+
+export const cancelCustomerOrder = async (
+  orderId: string,
+  userId: string,
+): Promise<CustomerOrder> =>
+  runTransaction(db, async (transaction) => {
+    const orderRef = doc(db, "orders", orderId);
+    const orderSnapshot = await transaction.get(orderRef);
+
+    if (!orderSnapshot.exists()) {
+      throw new Error("This order could not be found.");
+    }
+
+    const order = toCustomerOrder(orderSnapshot.id, orderSnapshot.data());
+
+    if (order.userId !== userId) {
+      throw new Error("You cannot cancel an order that is not yours.");
+    }
+
+    if (!canCustomerCancelOrder(order.status)) {
+      if (order.status === "shipped") {
+        throw new Error(
+          "This order has already shipped. Please contact support if you need to cancel it.",
+        );
+      }
+
+      throw new Error("This order can no longer be cancelled.");
+    }
+
+    const cancellationEntry: OrderTimelineEntry = {
+      status: "cancelled",
+      note: "Order cancelled by customer.",
+      at: Timestamp.now(),
+    };
+    const timeline = [...order.timeline, cancellationEntry];
+
+    transaction.update(orderRef, {
+      status: "cancelled",
+      timeline,
+      updatedAt: serverTimestamp(),
+    });
+
+    return {
+      ...order,
+      status: "cancelled",
+      timeline,
+    };
+  });
 
 const generateOrderNumber = () => {
   const now = new Date();

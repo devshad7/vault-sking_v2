@@ -7,6 +7,7 @@ import CartIcon from "./CartIcon";
 import WishList from "./WishList";
 import SignIn from "../../auth/SignIn";
 import MobileMenu from "./MobileMenu";
+import OrdersButton from "./OrdersButton";
 
 const Navbar = () => {
   return (
@@ -26,6 +27,7 @@ const Navbar = () => {
           <SearchBar />
           <CartIcon />
           <WishList />
+          <OrdersButton />
           <SignIn />
         </div>
       </Container>
