@@ -13,7 +13,8 @@ import { Loader2, SlidersHorizontal, ArrowUpDown, X } from "lucide-react";
 import NoProductFound from "../Products/NoProductFound";
 import ProductCard from "../Products/ProductCard";
 import { motion, AnimatePresence } from "framer-motion";
-import { getProducts } from "@/lib/frontend-data";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "@/config/firebase.config";
 
 interface Props {
   categories: Category[];
@@ -26,10 +27,29 @@ const Shop = ({ categories, brands }: Props) => {
   const brandParams = searchParams?.get("brand");
   const categoryParams = searchParams?.get("category");
   const queryParam = searchParams?.get("q") || "";
-
-  const [products] = useState<Product[]>(() => getProducts());
   const [searchQuery, setSearchQuery] = useState(queryParam);
   const loading = false;
+
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      collection(db, "products"),
+      (snapshot) => {
+        const data = snapshot.docs.map((doc) => ({
+          ...(doc.data() as Omit<Product, "_id">),
+          _id: doc.id,
+        }));
+
+        setProducts(data);
+      },
+      (error) => {
+        console.error(error);
+      },
+    );
+
+    return unsubscribe;
+  }, []);
 
   // Sync searchQuery state when query param changes (e.g. searching again from navbar while on shop page)
   useEffect(() => {
@@ -39,13 +59,15 @@ const Shop = ({ categories, brands }: Props) => {
 
   // Active filters applied to filtering and rendering
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
-    categoryParams ? [categoryParams] : []
+    categoryParams ? [categoryParams] : [],
   );
   const [selectedBrands, setSelectedBrands] = useState<string[]>(
-    brandParams ? [brandParams] : []
+    brandParams ? [brandParams] : [],
   );
   const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
-  const [selectedSkinConcerns, setSelectedSkinConcerns] = useState<string[]>([]);
+  const [selectedSkinConcerns, setSelectedSkinConcerns] = useState<string[]>(
+    [],
+  );
   const [selectedBenefits, setSelectedBenefits] = useState<string[]>([]);
   const [selectedSort, setSelectedSort] = useState<string>("default");
 
@@ -134,37 +156,102 @@ const Shop = ({ categories, brands }: Props) => {
       const text = `${product.name} ${product.description || ""}`.toLowerCase();
 
       if (selectedBrands.length > 0) {
-        const normalize = (s?: string) => s?.toLowerCase().replace(/[\s-]/g, "") || "";
+        const normalize = (s?: string) =>
+          s?.toLowerCase().replace(/[\s-]/g, "") || "";
         const matches = selectedBrands.some(
-          (b) =>
-            normalize(product.brand) === normalize(b)
+          (b) => normalize(product.brand) === normalize(b),
         );
         if (!matches) return false;
       }
 
       if (selectedSkinConcerns.length > 0) {
         const keywords: Record<string, string[]> = {
-          acne: ["acne", "blemish", "salicylic", "spot", "breakout", "clearing", "pimple", "anti-acne"],
-          dryness: ["dry", "hydration", "moistur", "hyaluronic", "dryness", "dehydrated", "nourish"],
-          pigmentation: ["pigment", "dark spot", "bright", "niacinamide", "vitamin c", "whitening", "tone", "fade", "melasma"],
-          "anti-aging": ["aging", "wrinkle", "retinol", "collagen", "fine line", "firming", "youth", "anti-age"],
+          acne: [
+            "acne",
+            "blemish",
+            "salicylic",
+            "spot",
+            "breakout",
+            "clearing",
+            "pimple",
+            "anti-acne",
+          ],
+          dryness: [
+            "dry",
+            "hydration",
+            "moistur",
+            "hyaluronic",
+            "dryness",
+            "dehydrated",
+            "nourish",
+          ],
+          pigmentation: [
+            "pigment",
+            "dark spot",
+            "bright",
+            "niacinamide",
+            "vitamin c",
+            "whitening",
+            "tone",
+            "fade",
+            "melasma",
+          ],
+          "anti-aging": [
+            "aging",
+            "wrinkle",
+            "retinol",
+            "collagen",
+            "fine line",
+            "firming",
+            "youth",
+            "anti-age",
+          ],
         };
 
         const matches = selectedSkinConcerns.some((concern) =>
-          keywords[concern]?.some((keyword) => text.includes(keyword))
+          keywords[concern]?.some((keyword) => text.includes(keyword)),
         );
         if (!matches) return false;
       }
 
       if (selectedBenefits.length > 0) {
         const keywords: Record<string, string[]> = {
-          hydration: ["hydration", "moistur", "hyaluronic", "dry", "water", "dewy", "hydrating", "plump"],
-          brightening: ["bright", "glow", "vitamin c", "niacinamide", "whitening", "radiance", "toning", "luminous"],
-          repair: ["repair", "barrier", "ceramide", "cicaplast", "cica", "centella", "soothing", "calming", "panthenol", "recovery"],
+          hydration: [
+            "hydration",
+            "moistur",
+            "hyaluronic",
+            "dry",
+            "water",
+            "dewy",
+            "hydrating",
+            "plump",
+          ],
+          brightening: [
+            "bright",
+            "glow",
+            "vitamin c",
+            "niacinamide",
+            "whitening",
+            "radiance",
+            "toning",
+            "luminous",
+          ],
+          repair: [
+            "repair",
+            "barrier",
+            "ceramide",
+            "cicaplast",
+            "cica",
+            "centella",
+            "soothing",
+            "calming",
+            "panthenol",
+            "recovery",
+          ],
         };
 
         const matches = selectedBenefits.some((benefit) =>
-          keywords[benefit]?.some((keyword) => text.includes(keyword))
+          keywords[benefit]?.some((keyword) => text.includes(keyword)),
         );
         if (!matches) return false;
       }
@@ -216,7 +303,9 @@ const Shop = ({ categories, brands }: Props) => {
         <div className="hidden md:flex items-center justify-between mb-6 pb-4 border-b border-border/20">
           <div className="flex flex-col gap-1">
             <Title className="text-xl font-bold tracking-tight text-text">
-              {searchQuery ? `Search Results for "${searchQuery}"` : "Shop Products"}
+              {searchQuery
+                ? `Search Results for "${searchQuery}"`
+                : "Shop Products"}
             </Title>
             {searchQuery && (
               <button
@@ -232,7 +321,8 @@ const Shop = ({ categories, brands }: Props) => {
           </div>
           <div className="flex items-center gap-6">
             <span className="text-sm font-semibold text-text-muted">
-              Showing {sortedProducts.length} {sortedProducts.length === 1 ? "result" : "results"}
+              Showing {sortedProducts.length}{" "}
+              {sortedProducts.length === 1 ? "result" : "results"}
             </span>
             <div className="relative flex items-center gap-1.5 border border-border/40 rounded-lg px-3 py-2 bg-white shadow-sm">
               <ArrowUpDown className="w-3.5 h-3.5 text-text-muted" />
@@ -247,7 +337,9 @@ const Shop = ({ categories, brands }: Props) => {
                 <option value="name-asc">Name: A to Z</option>
                 <option value="name-desc">Name: Z to A</option>
               </select>
-              <span className="absolute right-3 pointer-events-none text-text-muted text-[10px]">▼</span>
+              <span className="absolute right-3 pointer-events-none text-text-muted text-[10px]">
+                ▼
+              </span>
             </div>
           </div>
         </div>
@@ -261,7 +353,7 @@ const Shop = ({ categories, brands }: Props) => {
             <SlidersHorizontal className="w-4 h-4" />
             Filter {activeFiltersCount > 0 ? `(${activeFiltersCount})` : ""}
           </button>
-          
+
           <div className="relative flex items-center gap-1.5 border border-border/40 rounded-lg px-3 py-2 bg-gray-50/50">
             <ArrowUpDown className="w-3.5 h-3.5 text-text-muted" />
             <select
@@ -276,9 +368,10 @@ const Shop = ({ categories, brands }: Props) => {
               <option value="name-desc">Name: Z-A</option>
             </select>
           </div>
-          
+
           <span className="text-xs font-semibold text-text-muted">
-            {sortedProducts.length} {sortedProducts.length === 1 ? "Product" : "Products"}
+            {sortedProducts.length}{" "}
+            {sortedProducts.length === 1 ? "Product" : "Products"}
           </span>
         </div>
 
@@ -298,9 +391,11 @@ const Shop = ({ categories, brands }: Props) => {
           </div>
         )}
 
-<div className="flex flex-col md:flex-row gap-5">          {/* Desktop Filter Sidebar */}
-<div
-  className="
+        <div className="flex flex-col md:flex-row gap-5">
+          {" "}
+          {/* Desktop Filter Sidebar */}
+          <div
+            className="
     hidden md:block
     w-[260px]
     shrink-0
@@ -314,8 +409,12 @@ const Shop = ({ categories, brands }: Props) => {
     p-4
     shadow-sm
   "
->            <div className="flex items-center justify-between border-b border-border/40 pb-4 mb-2">
-              <span className="text-base font-bold text-text">Filter Products</span>
+          >
+            {" "}
+            <div className="flex items-center justify-between border-b border-border/40 pb-4 mb-2">
+              <span className="text-base font-bold text-text">
+                Filter Products
+              </span>
               {activeFiltersCount > 0 && (
                 <button
                   onClick={resetAllFilters}
@@ -325,37 +424,33 @@ const Shop = ({ categories, brands }: Props) => {
                 </button>
               )}
             </div>
-            
             <CategoryList
               categories={categories}
               selectedCategories={selectedCategories}
               setSelectedCategories={setSelectedCategories}
             />
-            
             <BrandList
               brands={brands}
               selectedBrands={selectedBrands}
               setSelectedBrands={setSelectedBrands}
             />
-            
             <PriceList
               selectedPrice={selectedPrice}
               setSelectedPrice={setSelectedPrice}
             />
-            
             <SkinConcernList
               selectedSkinConcerns={selectedSkinConcerns}
               setSelectedSkinConcerns={setSelectedSkinConcerns}
             />
-            
             <BenefitsList
               selectedBenefits={selectedBenefits}
               setSelectedBenefits={setSelectedBenefits}
             />
           </div>
-
           {/* Product Grid Area */}
-<div className="min-w-0 flex-1">            {loading ? (
+          <div className="min-w-0 flex-1">
+            {" "}
+            {loading ? (
               <div className="p-20 flex flex-col gap-3 items-center justify-center bg-white rounded-2xl border border-border/35 shadow-sm">
                 <Loader2 className="w-10 h-10 text-primary animate-spin" />
                 <p className="font-semibold tracking-wide text-base text-text-muted">
@@ -365,7 +460,10 @@ const Shop = ({ categories, brands }: Props) => {
             ) : sortedProducts?.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
                 {sortedProducts?.map((product) => (
-                  <div key={product?._id} className="h-full flex flex-col justify-between">
+                  <div
+                    key={product?._id}
+                    className="h-full flex flex-col justify-between"
+                  >
                     <ProductCard product={product} />
                   </div>
                 ))}
@@ -420,8 +518,21 @@ const Shop = ({ categories, brands }: Props) => {
                     onClick={() => toggleSection("categories")}
                     className="w-full flex items-center justify-between py-1 text-sm font-semibold text-text select-none text-left cursor-pointer"
                   >
-                    <span>Categories {draftCategories.length > 0 && `(${draftCategories.length})`}</span>
-                    <span className="text-xs transition-transform duration-200" style={{ transform: openSections.categories ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+                    <span>
+                      Categories{" "}
+                      {draftCategories.length > 0 &&
+                        `(${draftCategories.length})`}
+                    </span>
+                    <span
+                      className="text-xs transition-transform duration-200"
+                      style={{
+                        transform: openSections.categories
+                          ? "rotate(180deg)"
+                          : "rotate(0deg)",
+                      }}
+                    >
+                      ▼
+                    </span>
                   </button>
                   <AnimatePresence initial={false}>
                     {openSections.categories && (
@@ -450,8 +561,20 @@ const Shop = ({ categories, brands }: Props) => {
                     onClick={() => toggleSection("brands")}
                     className="w-full flex items-center justify-between py-4 text-sm font-semibold text-text select-none text-left cursor-pointer"
                   >
-                    <span>Brands {draftBrands.length > 0 && `(${draftBrands.length})`}</span>
-                    <span className="text-xs transition-transform duration-200" style={{ transform: openSections.brands ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+                    <span>
+                      Brands{" "}
+                      {draftBrands.length > 0 && `(${draftBrands.length})`}
+                    </span>
+                    <span
+                      className="text-xs transition-transform duration-200"
+                      style={{
+                        transform: openSections.brands
+                          ? "rotate(180deg)"
+                          : "rotate(0deg)",
+                      }}
+                    >
+                      ▼
+                    </span>
                   </button>
                   <AnimatePresence initial={false}>
                     {openSections.brands && (
@@ -481,7 +604,16 @@ const Shop = ({ categories, brands }: Props) => {
                     className="w-full flex items-center justify-between py-4 text-sm font-semibold text-text select-none text-left cursor-pointer"
                   >
                     <span>Price Range {draftPrice && `(1)`}</span>
-                    <span className="text-xs transition-transform duration-200" style={{ transform: openSections.price ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+                    <span
+                      className="text-xs transition-transform duration-200"
+                      style={{
+                        transform: openSections.price
+                          ? "rotate(180deg)"
+                          : "rotate(0deg)",
+                      }}
+                    >
+                      ▼
+                    </span>
                   </button>
                   <AnimatePresence initial={false}>
                     {openSections.price && (
@@ -509,8 +641,21 @@ const Shop = ({ categories, brands }: Props) => {
                     onClick={() => toggleSection("concern")}
                     className="w-full flex items-center justify-between py-4 text-sm font-semibold text-text select-none text-left cursor-pointer"
                   >
-                    <span>Skin Concern {draftSkinConcerns.length > 0 && `(${draftSkinConcerns.length})`}</span>
-                    <span className="text-xs transition-transform duration-200" style={{ transform: openSections.concern ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+                    <span>
+                      Skin Concern{" "}
+                      {draftSkinConcerns.length > 0 &&
+                        `(${draftSkinConcerns.length})`}
+                    </span>
+                    <span
+                      className="text-xs transition-transform duration-200"
+                      style={{
+                        transform: openSections.concern
+                          ? "rotate(180deg)"
+                          : "rotate(0deg)",
+                      }}
+                    >
+                      ▼
+                    </span>
                   </button>
                   <AnimatePresence initial={false}>
                     {openSections.concern && (
@@ -538,8 +683,20 @@ const Shop = ({ categories, brands }: Props) => {
                     onClick={() => toggleSection("benefits")}
                     className="w-full flex items-center justify-between py-4 text-sm font-semibold text-text select-none text-left cursor-pointer"
                   >
-                    <span>Benefits {draftBenefits.length > 0 && `(${draftBenefits.length})`}</span>
-                    <span className="text-xs transition-transform duration-200" style={{ transform: openSections.benefits ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+                    <span>
+                      Benefits{" "}
+                      {draftBenefits.length > 0 && `(${draftBenefits.length})`}
+                    </span>
+                    <span
+                      className="text-xs transition-transform duration-200"
+                      style={{
+                        transform: openSections.benefits
+                          ? "rotate(180deg)"
+                          : "rotate(0deg)",
+                      }}
+                    >
+                      ▼
+                    </span>
                   </button>
                   <AnimatePresence initial={false}>
                     {openSections.benefits && (

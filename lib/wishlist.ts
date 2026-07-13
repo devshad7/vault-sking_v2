@@ -1,47 +1,104 @@
-import { getProductById } from "@/lib/frontend-data";
-import type { Product } from "@/data/products";
+"use client";
 
-const STORAGE_KEY = "vault-skin-wishlist";
+const WISHLIST_KEY = "guest_wishlist";
+const LEGACY_WISHLIST_KEY = "vault-skin-wishlist";
 
-export function saveWishlistItem(productId: string) {
-  const current = readWishlistItems();
-  if (!current.includes(productId)) {
-    current.push(productId);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(current));
-  }
-  return true;
-}
+const migrateLegacyWishlist = () => {
+  if (typeof window === "undefined") return;
 
-export function deleteWishlistItem(productId: string) {
-  const current = readWishlistItems().filter((item) => item !== productId);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(current));
-  return true;
-}
-
-export function clearUserWishlist() {
-  localStorage.removeItem(STORAGE_KEY);
-  return true;
-}
-
-export function getWishlistItems() {
-  return readWishlistItems();
-}
-
-export function loadUserWishlist(): Product[] {
-  return readWishlistItems()
-    .map((productId) => getProductById(productId))
-    .filter((product): product is Product => Boolean(product));
-}
-
-function readWishlistItems() {
-  if (typeof window === "undefined") {
-    return [] as string[];
-  }
+  const legacy = localStorage.getItem(LEGACY_WISHLIST_KEY);
+  if (!legacy) return;
 
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const legacyIds = JSON.parse(legacy) as string[];
+    const current = readWishlistIds();
+    const merged = [...new Set([...current, ...legacyIds])];
+    saveGuestWishlist(merged);
+    localStorage.removeItem(LEGACY_WISHLIST_KEY);
+  } catch {
+    localStorage.removeItem(LEGACY_WISHLIST_KEY);
+  }
+};
+
+const readWishlistIds = (): string[] => {
+  if (typeof window === "undefined") return [];
+
+  migrateLegacyWishlist();
+
+  try {
+    const raw = localStorage.getItem(WISHLIST_KEY);
     return raw ? (JSON.parse(raw) as string[]) : [];
   } catch {
-    return [] as string[];
+    return [];
   }
-}
+};
+
+/**
+ * Get guest wishlist product IDs
+ */
+export const getGuestWishlist = (): string[] => readWishlistIds();
+
+/**
+ * Save guest wishlist
+ */
+export const saveGuestWishlist = (ids: string[]) => {
+  localStorage.setItem(WISHLIST_KEY, JSON.stringify(ids));
+};
+
+/**
+ * Add product to guest wishlist
+ */
+export const addGuestWishlistItem = (productId: string): string[] => {
+  const wishlist = getGuestWishlist();
+
+  if (wishlist.includes(productId)) {
+    return wishlist;
+  }
+
+  const updated = [...wishlist, productId];
+  saveGuestWishlist(updated);
+
+  return updated;
+};
+
+/**
+ * Remove product from guest wishlist
+ */
+export const removeGuestWishlistItem = (productId: string): string[] => {
+  const updated = getGuestWishlist().filter((id) => id !== productId);
+  saveGuestWishlist(updated);
+
+  return updated;
+};
+
+/**
+ * Toggle product in guest wishlist
+ */
+export const toggleGuestWishlistItem = (productId: string): string[] => {
+  const wishlist = getGuestWishlist();
+
+  if (wishlist.includes(productId)) {
+    return removeGuestWishlistItem(productId);
+  }
+
+  return addGuestWishlistItem(productId);
+};
+
+/**
+ * Clear guest wishlist
+ */
+export const clearGuestWishlist = () => {
+  localStorage.removeItem(WISHLIST_KEY);
+};
+
+/**
+ * Check if product is in guest wishlist
+ */
+export const isInGuestWishlist = (productId: string) => {
+  return getGuestWishlist().includes(productId);
+};
+
+/**
+ * Guest wishlist count
+ */
+export const getGuestWishlistCount = () => getGuestWishlist().length;

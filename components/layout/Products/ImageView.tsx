@@ -2,14 +2,22 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
+import { useState } from "react";
 
 interface Props {
-  images?: string;
+  images?: Array<{
+    src: string;
+    alt: string;
+  }>;
   isStock?: number;
 }
 
-const ImageView = ({ images, isStock }: Props) => {
-  const active = images;
+const ImageView = ({ images = [], isStock }: Props) => {
+  const validImages = images.filter(
+    (image): image is { src: string; alt: string } =>
+      typeof image?.src === "string" && image.src.trim().length > 0,
+  );
+  const [active, setActive] = useState(validImages[0]);
 
   if (!active) return null;
 
@@ -30,7 +38,7 @@ const ImageView = ({ images, isStock }: Props) => {
       >
         <AnimatePresence>
           <motion.div
-            key={active}
+            key={active?.src}
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
@@ -41,8 +49,8 @@ const ImageView = ({ images, isStock }: Props) => {
             className="absolute inset-0"
           >
             <Image
-              src={active}
-              alt="Product Image"
+              src={active.src}
+              alt={active.alt}
               fill
               priority
               sizes="(max-width: 1024px) 100vw, 50vw"
@@ -61,10 +69,10 @@ const ImageView = ({ images, isStock }: Props) => {
       </div>
 
       <div className="flex flex-wrap gap-3">
-        {images && (
+        {validImages.map((image, idx) => (
           <button
-            key={images}
-            // onClick={() => setActive(images)}
+            key={idx}
+            onClick={() => setActive(image)}
             className={`
               h-20
               w-20
@@ -75,21 +83,21 @@ const ImageView = ({ images, isStock }: Props) => {
               transition-all
               duration-300
               ${
-                active === images
+                active.src === image.src
                   ? "border-primary shadow-md scale-105"
                   : "border-border hover:border-primary/40 hover:scale-105"
               }
             `}
           >
             <Image
-              src={images}
-              alt="Thumbnail"
+              src={image.src}
+              alt={image.alt}
               width={100}
               height={100}
               className="w-full h-full object-contain"
             />
           </button>
-        )}
+        ))}
       </div>
     </div>
   );

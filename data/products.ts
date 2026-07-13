@@ -1,6 +1,6 @@
 export type ProductImage = {
-  _key?: string;
-  url: string;
+  src?: string;
+  url?: string;
   alt?: string;
 };
 
@@ -98,157 +98,157 @@ export type OrderItem = {
   }>;
 };
 
-const products: Product[] = [
-  {
-    _id: "prod-001",
-    _type: "product",
-    id: "prod-001",
-    slug: { current: "vitamin-c-brightening-serum" },
-    name: "Vitamin C Brightening Serum",
-    description:
-      "A daily antioxidant serum that visibly brightens and evens skin tone.",
-    richDescription:
-      "This multitasking serum combines vitamin C, niacinamide, and ferulic acid to brighten dullness, support collagen, and protect against environmental stressors. It layers beautifully under moisturizer and sunscreen for a radiant complexion.",
-    price: 3200,
-    discount: 400,
-    stock: 18,
-    sku: "SK-VC-001",
-    category: "Serums",
-    brand: "The Ordinary",
-    images: [
-      {
-        _key: "img-1",
-        url: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
-        alt: "Vitamin C serum",
-      },
-      {
-        _key: "img-2",
-        url: "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=80",
-        alt: "Serum bottle",
-      },
-    ],
-    thumbnail:
-      "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
-    ingredients: [
-      {
-        title: "Vitamin C",
-        description: "Brightens the look of dull skin and supports collagen.",
-      },
-      {
-        title: "Niacinamide",
-        description: "Helps smooth texture and refine pores.",
-      },
-    ],
-    benefits: ["Brightening", "Antioxidant protection", "Even tone"],
-    howToUse: [
-      "Apply 2-3 drops to cleansed skin in the morning.",
-      "Follow with moisturizer and sunscreen.",
-    ],
-    warnings: ["Avoid contact with eyes.", "Patch test before first use."],
-    storageInstructions: [
-      "Store in a cool, dry place away from direct sunlight.",
-    ],
-    faqs: [
-      {
-        question: "Is it suitable for sensitive skin?",
-        answer: "Yes, it is designed to be gentle and fragrance-free.",
-      },
-    ],
-    specifications: [
-      { label: "Skin Type", value: "Normal, Dry, Oily" },
-      { label: "Texture", value: "Lightweight serum" },
-    ],
-    certifications: ["Cruelty-free", "Dermatologist tested"],
-    reviews: [
-      {
-        id: 1,
-        author: "Nira",
-        rating: 5,
-        date: "2026-06-01",
-        title: "Glowing skin",
-        content: "Love how radiant my skin looks after a week.",
-      },
-    ],
-    ratings: 4.8,
-    gallery: [
-      {
-        _key: "gal-1",
-        url: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
-      },
-    ],
-    badges: ["Best Seller", "Vitamin C"],
-    tags: ["brightening", "serum", "vitamin-c"],
-    categories: ["serums", "brightening"],
-    variant: "serum",
-    status: "new",
-    isFeatured: true,
-  },
-  {
-    _id: "prod-002",
-    _type: "product",
-    id: "prod-002",
-    slug: { current: "hydrating-gel-cream" },
-    name: "Hydrating Gel Cream",
-    description:
-      "A lightweight gel cream that locks in moisture without feeling heavy.",
-    richDescription:
-      "This moisturizer is designed for skin that needs hydration with a fresh, bouncy finish. It combines glycerin and ceramides to support the skin barrier and maintain comfort all day.",
-    price: 2800,
-    discount: 300,
-    stock: 24,
-    sku: "SK-HC-002",
-    category: "Moisturizers",
-    brand: "CeraVe",
-    images: [
-      {
-        _key: "img-3",
-        url: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
-        alt: "Gel cream",
-      },
-    ],
-    thumbnail:
-      "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
-    ingredients: [
-      { title: "Ceramides", description: "Reinforces the skin barrier." },
-      { title: "Glycerin", description: "Attracts and retains hydration." },
-    ],
-    benefits: ["Deep hydration", "Barrier support", "Non-greasy"],
-    howToUse: ["Massage over damp skin after cleansing."],
-    warnings: ["For external use only."],
-    storageInstructions: ["Keep sealed and away from heat."],
-    faqs: [
-      {
-        question: "Can I use it day and night?",
-        answer: "Yes, it works well morning and evening.",
-      },
-    ],
-    specifications: [{ label: "Texture", value: "Gel cream" }],
-    certifications: ["Dermatologist tested"],
-    reviews: [
-      {
-        id: 2,
-        author: "Mina",
-        rating: 4,
-        date: "2026-05-20",
-        title: "Comforting",
-        content: "Perfect for humid weather.",
-      },
-    ],
-    ratings: 4.6,
-    gallery: [
-      {
-        _key: "gal-2",
-        url: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
-      },
-    ],
-    badges: ["Hydrating"],
-    tags: ["moisturizer", "hydration", "gel"],
-    categories: ["moisturizers", "hydration"],
-    variant: "moisturizer",
-    status: "hot",
-    isFeatured: true,
-  },
-];
+// const products: Product[] = [
+//   {
+//     _id: "prod-001",
+//     _type: "product",
+//     id: "prod-001",
+//     slug: { current: "vitamin-c-brightening-serum" },
+//     name: "Vitamin C Brightening Serum",
+//     description:
+//       "A daily antioxidant serum that visibly brightens and evens skin tone.",
+//     richDescription:
+//       "This multitasking serum combines vitamin C, niacinamide, and ferulic acid to brighten dullness, support collagen, and protect against environmental stressors. It layers beautifully under moisturizer and sunscreen for a radiant complexion.",
+//     price: 3200,
+//     discount: 400,
+//     stock: 18,
+//     sku: "SK-VC-001",
+//     category: "Serums",
+//     brand: "The Ordinary",
+//     images: [
+//       {
+//         _key: "img-1",
+//         url: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
+//         alt: "Vitamin C serum",
+//       },
+//       {
+//         _key: "img-2",
+//         url: "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=80",
+//         alt: "Serum bottle",
+//       },
+//     ],
+//     thumbnail:
+//       "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
+//     ingredients: [
+//       {
+//         title: "Vitamin C",
+//         description: "Brightens the look of dull skin and supports collagen.",
+//       },
+//       {
+//         title: "Niacinamide",
+//         description: "Helps smooth texture and refine pores.",
+//       },
+//     ],
+//     benefits: ["Brightening", "Antioxidant protection", "Even tone"],
+//     howToUse: [
+//       "Apply 2-3 drops to cleansed skin in the morning.",
+//       "Follow with moisturizer and sunscreen.",
+//     ],
+//     warnings: ["Avoid contact with eyes.", "Patch test before first use."],
+//     storageInstructions: [
+//       "Store in a cool, dry place away from direct sunlight.",
+//     ],
+//     faqs: [
+//       {
+//         question: "Is it suitable for sensitive skin?",
+//         answer: "Yes, it is designed to be gentle and fragrance-free.",
+//       },
+//     ],
+//     specifications: [
+//       { label: "Skin Type", value: "Normal, Dry, Oily" },
+//       { label: "Texture", value: "Lightweight serum" },
+//     ],
+//     certifications: ["Cruelty-free", "Dermatologist tested"],
+//     reviews: [
+//       {
+//         id: 1,
+//         author: "Nira",
+//         rating: 5,
+//         date: "2026-06-01",
+//         title: "Glowing skin",
+//         content: "Love how radiant my skin looks after a week.",
+//       },
+//     ],
+//     ratings: 4.8,
+//     gallery: [
+//       {
+//         _key: "gal-1",
+//         url: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
+//       },
+//     ],
+//     badges: ["Best Seller", "Vitamin C"],
+//     tags: ["brightening", "serum", "vitamin-c"],
+//     categories: ["serums", "brightening"],
+//     variant: "serum",
+//     status: "new",
+//     isFeatured: true,
+//   },
+//   {
+//     _id: "prod-002",
+//     _type: "product",
+//     id: "prod-002",
+//     slug: { current: "hydrating-gel-cream" },
+//     name: "Hydrating Gel Cream",
+//     description:
+//       "A lightweight gel cream that locks in moisture without feeling heavy.",
+//     richDescription:
+//       "This moisturizer is designed for skin that needs hydration with a fresh, bouncy finish. It combines glycerin and ceramides to support the skin barrier and maintain comfort all day.",
+//     price: 2800,
+//     discount: 300,
+//     stock: 24,
+//     sku: "SK-HC-002",
+//     category: "Moisturizers",
+//     brand: "CeraVe",
+//     images: [
+//       {
+//         _key: "img-3",
+//         url: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+//         alt: "Gel cream",
+//       },
+//     ],
+//     thumbnail:
+//       "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+//     ingredients: [
+//       { title: "Ceramides", description: "Reinforces the skin barrier." },
+//       { title: "Glycerin", description: "Attracts and retains hydration." },
+//     ],
+//     benefits: ["Deep hydration", "Barrier support", "Non-greasy"],
+//     howToUse: ["Massage over damp skin after cleansing."],
+//     warnings: ["For external use only."],
+//     storageInstructions: ["Keep sealed and away from heat."],
+//     faqs: [
+//       {
+//         question: "Can I use it day and night?",
+//         answer: "Yes, it works well morning and evening.",
+//       },
+//     ],
+//     specifications: [{ label: "Texture", value: "Gel cream" }],
+//     certifications: ["Dermatologist tested"],
+//     reviews: [
+//       {
+//         id: 2,
+//         author: "Mina",
+//         rating: 4,
+//         date: "2026-05-20",
+//         title: "Comforting",
+//         content: "Perfect for humid weather.",
+//       },
+//     ],
+//     ratings: 4.6,
+//     gallery: [
+//       {
+//         _key: "gal-2",
+//         url: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+//       },
+//     ],
+//     badges: ["Hydrating"],
+//     tags: ["moisturizer", "hydration", "gel"],
+//     categories: ["moisturizers", "hydration"],
+//     variant: "moisturizer",
+//     status: "hot",
+//     isFeatured: true,
+//   },
+// ];
 
 const categories: Category[] = [
   {
@@ -373,34 +373,34 @@ const orders: OrderItem[] = [
   },
 ];
 
-export function getProducts(): Product[] {
-  return products;
-}
+// export function getProducts(): Product[] {
+//   return products;
+// }
 
-export function getProductBySlug(slug: string): Product | undefined {
-  return products.find((product) => product.slug.current === slug);
-}
+// export function getProductBySlug(slug: string): Product | undefined {
+//   return products.find((product) => product.slug.current === slug);
+// }
 
-export function getFeaturedProducts(): Product[] {
-  return products.filter((product) => product.isFeatured);
-}
+// export function getFeaturedProducts(): Product[] {
+//   return products.filter((product) => product.isFeatured);
+// }
 
-export function getDealProducts(): Product[] {
-  return products.filter(
-    (product) => product.discount > 0 || product.status === "sale",
-  );
-}
+// export function getDealProducts(): Product[] {
+//   return products.filter(
+//     (product) => product.discount > 0 || product.status === "sale",
+//   );
+// }
 
-export function getRelatedProducts(currentSlug: string): Product[] {
-  const current = getProductBySlug(currentSlug);
-  if (!current) return [];
-  return products
-    .filter(
-      (product) =>
-        product._id !== current._id && product.category === current.category,
-    )
-    .slice(0, 4);
-}
+// export function getRelatedProducts(currentSlug: string): Product[] {
+//   const current = getProductBySlug(currentSlug);
+//   if (!current) return [];
+//   return products
+//     .filter(
+//       (product) =>
+//         product._id !== current._id && product.category === current.category,
+//     )
+//     .slice(0, 4);
+// }
 
 export function getCategories(): Category[] {
   return categories;
@@ -440,26 +440,26 @@ export function getMyOrders(): OrderItem[] {
   return orders;
 }
 
-export function getProductsByCategory(categorySlug: string): Product[] {
-  return products.filter(
-    (product) =>
-      product.categories?.includes(categorySlug) ||
-      product.category.toLowerCase() === categorySlug.toLowerCase(),
-  );
-}
+// export function getProductsByCategory(categorySlug: string): Product[] {
+//   return products.filter(
+//     (product) =>
+//       product.categories?.includes(categorySlug) ||
+//       product.category.toLowerCase() === categorySlug.toLowerCase(),
+//   );
+// }
 
-export function getProductsByBrand(brandSlug: string): Product[] {
-  return products.filter(
-    (product) =>
-      product.brand.toLowerCase().replace(/\s+/g, "-") ===
-      brandSlug.toLowerCase(),
-  );
-}
+// export function getProductsByBrand(brandSlug: string): Product[] {
+//   return products.filter(
+//     (product) =>
+//       product.brand.toLowerCase().replace(/\s+/g, "-") ===
+//       brandSlug.toLowerCase(),
+//   );
+// }
 
-export function getProductById(productId: string): Product | undefined {
-  return products.find(
-    (product) => product.id === productId || product._id === productId,
-  );
-}
+// export function getProductById(productId: string): Product | undefined {
+//   return products.find(
+//     (product) => product.id === productId || product._id === productId,
+//   );
+// }
 
-export default products;
+// export default products;

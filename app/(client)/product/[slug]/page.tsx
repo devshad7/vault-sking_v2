@@ -43,11 +43,53 @@ export default async function SingleProductPage({ params }: Props) {
     ...(doc.data() as Omit<Product, "_id">),
     _id: doc.id,
   };
+
+  const getImageSrc = (image: unknown) => {
+    if (!image || typeof image !== "object") return "";
+
+    const imageObj = image as {
+      src?: unknown;
+      url?: unknown;
+      asset?: { url?: unknown };
+    };
+
+    const candidates = [imageObj.src, imageObj.url, imageObj.asset?.url];
+    const firstValid = candidates.find(
+      (value) => typeof value === "string" && value.trim().length > 0,
+    );
+
+    return typeof firstValid === "string" ? firstValid.trim() : "";
+  };
+
+  const productImages = (product.images ?? [])
+    .map((image) => ({
+      src: getImageSrc(image),
+      alt: image?.alt?.trim() || product?.name || "Product image",
+    }))
+    .filter((image) => image.src.length > 0)
+    .map((image) => ({
+      src: image.src,
+      alt: image.alt,
+    }));
+
+  const normalizedImages =
+    productImages.length > 0
+      ? productImages
+      : typeof product?.thumbnail === "string" &&
+          product.thumbnail.trim().length > 0
+        ? [
+            {
+              src: product.thumbnail.trim(),
+              alt: product?.name || "Product image",
+            },
+          ]
+        : [];
+
   return (
     <>
       <Container className="flex flex-col md:flex-row gap-8 py-5 md:py-8">
-        {product?.thumbnail && (
-          <ImageView images={product?.thumbnail} isStock={product?.stock} />
+        {normalizedImages.length > 0 && (
+          <ImageView images={normalizedImages} isStock={product?.stock} />
         )}
         <div className="w-full lg:w-[50%] flex flex-col gap-5">
           <div className="space-y-2">

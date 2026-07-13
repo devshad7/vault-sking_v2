@@ -1,10 +1,17 @@
-export type { Product, Category, Brand, Blog, Announcement, OrderItem } from "@/data/products";
+export type {
+  Product,
+  Category,
+  Brand,
+  Blog,
+  Announcement,
+  OrderItem,
+} from "@/data/products";
 export {
-  getProducts,
-  getProductBySlug,
-  getFeaturedProducts,
-  getDealProducts,
-  getRelatedProducts,
+  // getProducts,
+  // getProductBySlug,
+  // getFeaturedProducts,
+  // getDealProducts,
+  // getRelatedProducts,
   getCategories,
   getBrands,
   getAllBlogs,
@@ -14,7 +21,7 @@ export {
   getBlogCategories,
   getActiveAnnouncement,
   getMyOrders,
-  getProductsByCategory,
-  getProductsByBrand,
-  getProductById,
+  // getProductsByCategory,
+  // getProductsByBrand,
+  // getProductById,
 } from "@/data/products";

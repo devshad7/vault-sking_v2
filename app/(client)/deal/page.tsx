@@ -1,11 +1,39 @@
+"use client";
+
 import Container from "@/components/Container";
 import ProductCard from "@/components/layout/Products/ProductCard";
 import Title from "@/components/layout/Products/Title";
-import { getDealProducts } from "@/lib/frontend-data";
-import React from "react";
+import { db } from "@/config/firebase.config";
+import type { Product } from "@/data/products";
+import { collection, onSnapshot } from "firebase/firestore";
+import { useEffect, useState } from "react";
 
 const DealPage = () => {
-  const products = getDealProducts();
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      collection(db, "products"),
+      (snapshot) => {
+        const data = snapshot.docs.map((doc) => ({
+          ...(doc.data() as Omit<Product, "_id">),
+          _id: doc.id,
+        }));
+
+        setProducts(data);
+      },
+      (error) => {
+        console.error(error);
+      },
+    );
+
+    return unsubscribe;
+  }, []);
+
+  const dealProducts = products.filter(
+    (product) => product.discount > 0 || product.status === "sale",
+  );
+
   return (
     <div className="py-10 bg-deal-bg">
       <Container>
@@ -13,7 +41,7 @@ const DealPage = () => {
           Hot Deals of the Week
         </Title>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5">
-          {products?.map((product) => (
+          {dealProducts.map((product) => (
             <ProductCard key={product?._id} product={product} />
           ))}
         </div>

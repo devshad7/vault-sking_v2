@@ -24,12 +24,6 @@ interface StoreState {
   getSubTotalPrice: () => number;
   getItemCount: (productId: string) => number;
   getGroupedItems: () => CartItem[];
-  //   // favorite
-  favoriteProduct: Product[];
-  setFavorite: (products: Product[]) => void;
-  addToFavorite: (product: Product) => void;
-  removeFromFavorite: (productId: string) => void;
-  resetFavorite: () => void;
 }
 
 const useStore = create<StoreState>()(
@@ -40,8 +34,6 @@ const useStore = create<StoreState>()(
       syncStatus: "guest",
       setSyncStatus: (status) => set({ syncStatus: status }),
       items: [],
-      favoriteProduct: [],
-      setFavorite: (products) => set({ favoriteProduct: products }),
 
       setItem: (items) => set({ items }),
       addItem: (product) =>
@@ -103,31 +95,6 @@ const useStore = create<StoreState>()(
         return item ? item.quantity : 0;
       },
       getGroupedItems: () => get().items,
-
-      addToFavorite: (product: Product) =>
-        set((state) => {
-          const isFavorite = state.favoriteProduct.some(
-            (item) => item._id === product._id
-          );
-
-          return {
-            favoriteProduct: isFavorite
-              ? state.favoriteProduct.filter(
-                (item) => item._id !== product._id
-              )
-              : [...state.favoriteProduct, product],
-          };
-        }),
-      removeFromFavorite: (productId: string) => {
-        set((state: StoreState) => ({
-          favoriteProduct: state.favoriteProduct.filter(
-            (item) => item?._id !== productId
-          ),
-        }));
-      },
-      resetFavorite: () => {
-        set({ favoriteProduct: [] });
-      },
     }),
     {
       name: "cart-store",

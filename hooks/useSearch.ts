@@ -1,13 +1,35 @@
-import { useState, useEffect, useMemo } from 'react';
-import debounce from 'lodash.debounce';
-import { SearchResult, rankResults } from '@/types/search';
-import { getProducts } from '@/data/products';
+import { useState, useEffect, useMemo } from "react";
+import debounce from "lodash.debounce";
+import { SearchResult, rankResults } from "@/types/search";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "@/config/firebase.config";
+import { Product } from "@/data/products";
 
 export function useSearch(query: string) {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      collection(db, "products"),
+      (snapshot) => {
+        const data = snapshot.docs.map((doc) => ({
+          ...(doc.data() as Omit<Product, "_id">),
+          _id: doc.id,
+        }));
+
+        setAllProducts(data);
+      },
+      (error) => {
+        console.error(error);
+      },
+    );
+
+    return unsubscribe;
+  }, []);
 
   const fetchResults = (searchTerm: string) => {
     if (!searchTerm || searchTerm.trim().length === 0) {
@@ -22,26 +44,25 @@ export function useSearch(query: string) {
     setError(null);
 
     try {
-      const allProducts = getProducts();
       // Map local products to SearchResult format
-      const searchData: SearchResult[] = allProducts.map(p => ({
+      const searchData: SearchResult[] = allProducts.map((p) => ({
         id: p._id,
         name: p.name,
         slug: p.slug.current,
         price: p.price.toString(),
-        imageUrl: p.images?.[0]?.url || "",
+        imageUrl: p.images?.[0]?.src || "",
         category: p.category,
         brand: p.brand,
         variant: p.variant || "",
         status: p.status || null,
-        rating: p.ratings
+        rating: p.ratings,
       }));
-      
+
       const ranked = rankResults(searchTerm, searchData);
       setResults(ranked);
       setHighlightedIndex(-1);
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Error fetching results';
+      const msg = e instanceof Error ? e.message : "Error fetching results";
       setError(msg);
       setResults([]);
       setHighlightedIndex(-1);
