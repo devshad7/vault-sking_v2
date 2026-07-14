@@ -59,7 +59,7 @@ const HomeCategories = () => {
   }, []);
 
   return (
-    <div className="bg-white border border-border/20  p-3 lg:p-5 rounded-md">
+    <div className="max-w-7xl mx-auto pbg-white border border-border/20  p-3 lg:p-5 rounded-md">
       <Title className="border-b pb-3">Popular Categories</Title>
       <div className="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {categories?.map((category) => (

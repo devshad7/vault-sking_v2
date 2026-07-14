@@ -9,8 +9,7 @@ export const quickLinksData = [
   { title: "Contact us", href: "/contact" },
   { title: "Terms & Conditions", href: "/terms" },
   { title: "Privacy Policy", href: "/privacy" },
-    {title: "Contact", href: "/contact"},
-  { title: "Help", href: "/help" },
+  { title: "Help", href: "/contact" },
 ];
 export const categoriesData = [
   { title: "Cleansers", href: "cleansers" },

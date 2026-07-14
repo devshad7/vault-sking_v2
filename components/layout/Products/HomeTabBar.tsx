@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "@/config/firebase.config";
 import { Category } from "@/data/products";
-
+import Title from "@/components/layout/Products/Title";
 interface Props {
   selectedTab: string;
   onTabSelect: (tab: string) => void;
@@ -33,19 +33,21 @@ const HomeTabBar = ({ selectedTab, onTabSelect }: Props) => {
   }, []);
 
   return (
-    <div className="space-y-4">
+    <div className=" max-w-7xl mx-auto space-y-4">
       {/* Header row */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-text sm:text-xl">Our Products</h2>
-        <Link
-          href="/shop"
-          className="flex items-center gap-1 text-sm font-medium text-text-muted hover:text-primary transition-colors duration-200"
-        >
-          See all
-          <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
-      </div>
+      <div className="w-full border-b border-border pb-4">
+        <div className="flex items-center justify-between">
+          <Title className="text-2xl font-bold">Our Products</Title>
 
+          <Link
+            href="/shop"
+            className="group flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+          >
+            See all
+            <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+          </Link>
+        </div>
+      </div>
       {/* Scrollable pill chips — mobile-first */}
       <div
         className="hidden md:flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 snap-x snap-mandatory scrollbar-hide"

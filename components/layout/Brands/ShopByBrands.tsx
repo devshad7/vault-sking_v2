@@ -2,17 +2,12 @@ import Link from "next/link";
 import type { Brand } from "@/data/products";
 import Title from "../Products/Title";
 import BrandCarousel from "./BrandCarousel";
-import { GitCompareArrows, Headset, ShieldCheck, Truck } from "lucide-react";
+import { GitCompareArrows, Headset, ShieldCheck} from "lucide-react";
 import { useEffect, useState } from "react";
-import { collection, onSnapshot } from "@firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "@/config/firebase.config";
 
 const extraData = [
-  {
-    title: "Free Delivery",
-    description: "Free shipping over NPR 5,000",
-    icon: <Truck size={42} />,
-  },
   {
     title: "Easy Returns",
     description: "Hassle-free return policy",

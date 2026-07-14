@@ -9,8 +9,8 @@ import dayjs from "dayjs";
 const LatestBlog = () => {
   const blogs = getLatestBlogs();
   return (
-    <div className="mb-3 lg:mb-6">
-      <Title>Latest Blog</Title>
+    <div className=" max-w-7xl mx-auto mb-3 lg:mb-6">
+      <Title className="border-b pb-3">Latest Blog</Title>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-5">
         {blogs.map((blog) => {

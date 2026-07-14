@@ -5,33 +5,37 @@ import ProductCard from "@/components/layout/Products/ProductCard";
 import Title from "@/components/layout/Products/Title";
 import { db } from "@/config/firebase.config";
 import type { Product } from "@/data/products";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot,query,where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
 const DealPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
+useEffect(() => {
+  const q = query(
+    collection(db, "products"),
+    where("status", "==", "hot")
+  );
 
-  useEffect(() => {
-    const unsubscribe = onSnapshot(
-      collection(db, "products"),
-      (snapshot) => {
-        const data = snapshot.docs.map((doc) => ({
-          ...(doc.data() as Omit<Product, "_id">),
-          _id: doc.id,
-        }));
+  const unsubscribe = onSnapshot(
+    q,
+    (snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
+        ...(doc.data() as Omit<Product, "_id">),
+        _id: doc.id,
+      }));
 
-        setProducts(data);
-      },
-      (error) => {
-        console.error(error);
-      },
-    );
+      setProducts(data);
+    },
+    (error) => {
+      console.error(error);
+    }
+  );
 
-    return unsubscribe;
-  }, []);
+  return unsubscribe;
+}, []);
 
   const dealProducts = products.filter(
-    (product) => product.discount > 0 || product.status === "sale",
+    (product) => product.discount > 0 || product.status === "hot",
   );
 
   return (

@@ -17,8 +17,7 @@ const OrdersButton = () => {
   if (isSignedIn) {
     return (
       <Link href="/order" className={buttonClassName}>
-        <Package className="h-4 w-4" aria-hidden="true" />
-        <span className="hidden sm:inline">Orders</span>
+        <Package className="h-6 w-6" aria-hidden="true" />
       </Link>
     );
   }
@@ -30,8 +29,7 @@ const OrdersButton = () => {
       signUpForceRedirectUrl="/order"
     >
       <button type="button" className={buttonClassName}>
-        <Package className="h-4 w-4" aria-hidden="true" />
-        <span className="hidden sm:inline">Orders</span>
+         <Package className="h-6 w-6" aria-hidden="true" />
       </button>
     </SignInButton>
   );
