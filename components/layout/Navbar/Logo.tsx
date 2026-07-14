@@ -13,7 +13,7 @@ const Logo = ({ className }: { className?: string }) => {
       )}
     >
       <Image
-        src="/logo.svg"
+        src="/Images/logo.svg"
         alt="Vault Enterprises Logo"
         width={300}
         height={100}

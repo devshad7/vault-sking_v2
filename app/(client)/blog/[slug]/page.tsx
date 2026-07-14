@@ -30,8 +30,8 @@ const SingleBlogPage = async ({
               src={blog?.mainImage}
               alt={blog.title || "Blog Image"}
               width={800}
-              height={800}
-              className="w-full max-h-125 object-cover rounded-lg"
+              height={500}
+              className="w-full max-h-86.5 object-cover rounded-lg"
             />
           )}
           <div>
@@ -40,26 +40,26 @@ const SingleBlogPage = async ({
                 {blog?.blogcategories?.map((item, index) => (
                   <p
                     key={index}
-                    className="font-semibold text-shop_dark_green tracking-wider"
+                    className="font-semibold text-primary tracking-wider"
                   >
                     {item?.title}
                   </p>
                 ))}
-                <span className="absolute left-0 -bottom-1.5 bg-lightColor/30 inline-block w-full h-0.5 group-hover:bg-shop_dark_green hover:cursor-pointer hoverEffect" />
+                <span className="absolute left-0 -bottom-1.5 bg-black/30 inline-block w-full h-0.5 group-hover:bg-primary hover:cursor-pointer hoverEffect" />
               </div>
-              <p className="flex items-center gap-1 text-lightColor relative group hover:cursor-pointer hover:text-shop_dark_green hoverEffect">
+              <p className="flex items-center gap-1 text-black relative group hover:cursor-pointer hover:text-primary hoverEffect">
                 <Pencil size={15} /> {blog?.author?.name}
-                <span className="absolute left-0 -bottom-1.5 bg-lightColor/30 inline-block w-full h-0.5 group-hover:bg-shop_dark_green hoverEffect" />
+                <span className="absolute left-0 -bottom-1.5 bg-black/30 inline-block w-full h-0.5 group-hover:bg-primary hoverEffect" />
               </p>
-              <p className="flex items-center gap-1 text-lightColor relative group hover:cursor-pointer hover:text-shop_dark_green hoverEffect">
+              <p className="flex items-center gap-1 text-black relative group hover:cursor-pointer hover:text-primary hoverEffect">
                 <Calendar size={15} />{" "}
                 {dayjs(blog.publishedAt).format("MMMM D, YYYY")}
-                <span className="absolute left-0 -bottom-1.5 bg-lightColor/30 inline-block w-full h-0.5 group-hover:bg-shop_dark_green hoverEffect" />
+                <span className="absolute left-0 -bottom-1.5 bg-black/30 inline-block w-full h-0.5 group-hover:bg-primary hoverEffect" />
               </p>
             </div>
             <h2 className="text-2xl font-bold my-5">{blog?.title}</h2>
             <div className="flex flex-col">
-              <div className="text-lightColor">
+              <div className="text-black">
                 <div>
                   {blog.body && (
                     <p className="text-base leading-8">{blog.body}</p>
@@ -89,21 +89,21 @@ const BlogLeft = async ({ slug }: { slug: string }) => {
 
   return (
     <div>
-      <div className="border border-lightColor p-5 rounded-md">
+      <div className="border border-black p-5 rounded-md">
         <Title className="text-base">Blog Categories</Title>
         <div className="space-y-2 mt-2">
           {categories?.map((item, index) => (
             <div
               key={index}
-              className="text-lightColor flex items-center justify-between text-sm font-medium"
+              className="text-black flex items-center justify-between text-sm font-medium"
             >
               <p>{item?.title}</p>
-              <p className="text-darkColor font-semibold">{`(1)`}</p>
+              <p className="text-primary font-semibold">{`(1)`}</p>
             </div>
           ))}
         </div>
       </div>
-      <div className="border border-lightColor p-5 rounded-md mt-10">
+      <div className="border border-black p-5 rounded-md mt-10">
         <Title className="text-base">Latest Blogs</Title>
         <div className="space-y-4 mt-4">
           {blogs?.map((blog, index) => (
@@ -118,10 +118,10 @@ const BlogLeft = async ({ slug }: { slug: string }) => {
                   alt="blogImage"
                   width={100}
                   height={100}
-                  className="w-16 h-16 rounded-full object-cover border border-shop_dark_green/10 group-hover:border-shop_dark_green hoverEffect"
+                  className="w-16 h-16 rounded-full object-cover border border-primary/10 group-hover:border-primary hoverEffect"
                 />
               )}
-              <p className="line-clamp-2 text-sm text-lightColor group-hover:text-shop_dark_green hoverEffect">
+              <p className="line-clamp-2 text-sm text-black group-hover:text-primary hoverEffect">
                 {blog?.title}
               </p>
             </Link>

@@ -4,6 +4,7 @@ import { Heart } from "lucide-react";
 import type { Product } from "@/data/products";
 import { cn } from "@/lib/utils";
 import { useWishlist } from "@/hooks/useWishlist";
+import toast from "react-hot-toast";
 
 const AddToWishlistButton = ({
   product,
@@ -15,10 +16,16 @@ const AddToWishlistButton = ({
   const { toggleWishlist, isWishlisted } = useWishlist();
   const isFavorite = product._id ? isWishlisted(product._id) : false;
 
-  const handleFavorite = async (e: React.MouseEvent) => {
+  const handleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    await toggleWishlist(product);
+    toast.promise(toggleWishlist(product), {
+      loading: "Updating wishlist...",
+      success: isFavorite
+        ? `${product.name} removed from wishlist`
+        : `${product.name} added to wishlist`,
+      error: "Failed to update wishlist",
+    });
   };
 
   return (

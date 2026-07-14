@@ -35,9 +35,9 @@ const HomeTabBar = ({ selectedTab, onTabSelect }: Props) => {
   return (
     <div className=" max-w-7xl mx-auto space-y-4">
       {/* Header row */}
-      <div className="w-full border-b border-border pb-4">
+      <div className="w-full border-b border-border pb-2">
         <div className="flex items-center justify-between">
-          <Title className="text-2xl font-bold">Our Products</Title>
+          <Title className="text-2xl font-bold text-accent">Our Products</Title>
 
           <Link
             href="/shop"

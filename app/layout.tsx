@@ -22,7 +22,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         </ClerkProvider>
 
         <Toaster
-          position="bottom-right"
+          position="bottom-center"
           toastOptions={{
             style: {
               background: "#000000",

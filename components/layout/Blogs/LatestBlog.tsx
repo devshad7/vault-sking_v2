@@ -9,10 +9,19 @@ import dayjs from "dayjs";
 const LatestBlog = () => {
   const blogs = getLatestBlogs();
   return (
-    <div className=" max-w-7xl mx-auto mb-3 lg:mb-6">
-      <Title className="border-b pb-3">Latest Blog</Title>
+    <section className="max-w-7xl mx-auto">
+      <div className="mb-6 flex items-center justify-between border-b border-grey/60 pb-3">
+        <Title className="text-accent">Latest Blogs</Title>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-5">
+        <Link
+          href="/blogs"
+          className="text-sm font-semibold tracking-wide transition-colors hover:text-primary"
+        >
+          View all
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-6">
         {blogs.map((blog) => {
           if (!blog.slug?.current) return null;
 
@@ -23,8 +32,8 @@ const LatestBlog = () => {
                   <Image
                     src={blog.mainImage}
                     alt={blog.title ?? ""}
-                    width={350}
-                    height={350}
+                    width={250}
+                    height={250}
                     className="w-full max-h-40 object-cover"
                   />
                 </Link>
@@ -55,7 +64,7 @@ const LatestBlog = () => {
           );
         })}
       </div>
-    </div>
+    </section>
   );
 };
 

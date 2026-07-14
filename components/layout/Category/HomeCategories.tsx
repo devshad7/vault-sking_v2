@@ -59,9 +59,17 @@ const HomeCategories = () => {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto pbg-white border border-border/20  p-3 lg:p-5 rounded-md">
-      <Title className="border-b pb-3">Popular Categories</Title>
-      <div className="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+    <section className="w-full bg-surface p-3 md:p-5 lg:p-7 rounded-2xl">
+     <div className="mb-6 flex items-center justify-between border-b border-grey/60 pb-3">
+       <Title className="text-accent">Popular Categories</Title>
+      <Link
+          href="/shop"
+          className="text-sm font-semibold tracking-wide transition-colors hover:text-primary"
+        >
+          View all
+        </Link>
+     </div>
+      <div className="mt-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {categories?.map((category) => (
           <div
             key={category?._id}
@@ -90,7 +98,7 @@ const HomeCategories = () => {
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

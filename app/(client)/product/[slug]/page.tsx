@@ -8,14 +8,17 @@ import ProductAdditionalInfo from "@/components/layout/Products/ProductAdditiona
 import ProductIngredients from "@/components/layout/Products/ProductIngredients";
 import ProductFAQ from "@/components/layout/Products/ProductFAQ";
 import ProductReviews from "@/components/layout/Products/ProductReviews";
+import ProductBenefits from "@/components/layout/Products/ProductBenefits";
+import ProductUsage from "@/components/layout/Products/ProductUsage";
 import ProductTabs, {
   type Tab,
 } from "@/components/layout/Products/ProductTabs";
-import { CornerDownLeft, StarIcon, Truck } from "lucide-react";
+import {  StarIcon, Check, Tag } from "lucide-react";
 import { notFound } from "next/navigation";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/config/firebase.config";
 import { Product } from "@/data/products";
+import RecommendedProducts from "@/components/layout/Products/RecommendedProducts";
 
 interface Props {
   params: Promise<{
@@ -93,17 +96,29 @@ export default async function SingleProductPage({ params }: Props) {
         )}
         <div className="w-full lg:w-[50%] flex flex-col gap-5">
           <div className="space-y-2">
+            {product?.badges && product.badges.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {product.badges.map((badge, index) => (
+                  <span
+                    key={index}
+                    className="px-2 py-0.5 text-xs font-semibold bg-orange-100 text-orange-700 rounded-full"
+                  >
+                    {badge}
+                  </span>
+                ))}
+              </div>
+            )}
             <h2 className="text-2xl font-bold">{product?.name}</h2>
             <p className="text-sm text-gray-600 tracking-wide">
               {product?.description}
             </p>
-            <div className="flex items-center gap-0.5 text-xs">
+            <div className="flex items-center gap-0.5 text-xs p-1">
               {[...Array(5)].map((_, index) => (
                 <StarIcon
                   key={index}
                   className={
                     index < 4
-                      ? "w-4 h-4  fill-yellow-600 "
+                      ? "w-4 h-4  fill-yellow-700 "
                       : "w-4 h-4 text-primary fill-transparent"
                   }
                 />
@@ -115,7 +130,7 @@ export default async function SingleProductPage({ params }: Props) {
             <PriceView
               price={product?.price}
               discount={product?.discount}
-              className="text-lg font-bold mb-1"
+              className="text-lg font-bold mb-1 mt-2"
             />
             <p
               className={`mb-2 px-4 py-1 text-sm text-center inline-block font-semibold rounded-lg ${product?.stock === 0 ? "bg-red-100 text-red-600" : "text-green-600 bg-green-100"}`}
@@ -130,31 +145,50 @@ export default async function SingleProductPage({ params }: Props) {
             />
             <FavoriteButton showProduct={true} product={product} />
           </div>
-          <div className="space-y-3">
-            <div className="border border-border/25 border-b-0 p-3 flex items-center gap-2.5">
-              <Truck size={30} className="text-shop_orange" />
-              <div>
-                <p className="text-base font-semibold text-black">
-                  Free Delivery
-                </p>
-                <p className="text-sm text-gray-500 underline underline-offset-2">
-                  Enter your Postal code for Delivey Availability.
-                </p>
-              </div>
+    
+
+          {(product?.certifications && product.certifications.length > 0) ||
+          (product?.tags && product.tags.length > 0) ? (
+            <div className="pt-4 border-t border-gray-200 space-y-4">
+              {product?.certifications && product.certifications.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                    Certifications
+                  </h4>
+                  <div className="flex flex-wrap gap-3">
+                    {product.certifications.map((cert, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-1.5 text-sm text-gray-700"
+                      >
+                        <Check size={16} className="text-green-500" />
+                        <span>{cert}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {product?.tags && product.tags.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                    Tags
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {product.tags.map((tag, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-1.5 text-xs text-gray-600 bg-gray-100 px-2.5 py-1 rounded-md"
+                      >
+                        <Tag size={12} />
+                        <span>{tag}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="border border-border/25 p-3 flex items-center gap-2.5">
-              <CornerDownLeft size={30} className="text-shop_orange" />
-              <div>
-                <p className="text-base font-semibold text-black">
-                  Return Delivery
-                </p>
-                <p className="text-sm text-gray-500 ">
-                  Free 30days Delivery Returns.{" "}
-                  <span className="underline underline-offset-2">Details</span>
-                </p>
-              </div>
-            </div>
-          </div>
+          ) : null}
         </div>
       </Container>
       <Container className="pb-10">
@@ -186,6 +220,33 @@ export default async function SingleProductPage({ params }: Props) {
             });
           }
 
+          if (prod.benefits && prod.benefits.length > 0) {
+            tabs.push({
+              id: "benefits",
+              label: "Benefits",
+              content: <ProductBenefits benefits={prod.benefits} />,
+            });
+          }
+
+          const hasUsageInfo =
+            (prod.howToUse && prod.howToUse.length > 0) ||
+            (prod.warnings && prod.warnings.length > 0) ||
+            (prod.storageInstructions && prod.storageInstructions.length > 0);
+
+          if (hasUsageInfo) {
+            tabs.push({
+              id: "usage",
+              label: "How to Use",
+              content: (
+                <ProductUsage
+                  howToUse={prod.howToUse}
+                  warnings={prod.warnings}
+                  storageInstructions={prod.storageInstructions}
+                />
+              ),
+            });
+          }
+
           if (prod.faqs && prod.faqs.length > 0) {
             tabs.push({
               id: "faq",
@@ -202,6 +263,7 @@ export default async function SingleProductPage({ params }: Props) {
 
           return <ProductTabs tabs={tabs} />;
         })()}
+        <RecommendedProducts currentProductId={product._id} />
       </Container>
     </>
   );

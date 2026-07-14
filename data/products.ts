@@ -436,7 +436,7 @@ export function getActiveAnnouncement(): Announcement {
   return announcement;
 }
 
-export function getMyOrders(): OrderItem[] {
+export function getMyOrders(id: string): OrderItem[] {
   return orders;
 }
 

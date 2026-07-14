@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Brand } from "@/data/products";
 import Title from "../Products/Title";
 import BrandCarousel from "./BrandCarousel";
-import { GitCompareArrows, Headset, ShieldCheck} from "lucide-react";
+import { GitCompareArrows, Headset, } from "lucide-react";
 import { useEffect, useState } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "@/config/firebase.config";
@@ -18,11 +18,6 @@ const extraData = [
     description: "Friendly 24/7 customer support",
     icon: <Headset size={42} />,
   },
-  {
-    title: "Money Back Guarantee",
-    description: "Quality checked by our team",
-    icon: <ShieldCheck size={42} />,
-  },
 ];
 
 const ShopByBrands = () => {
@@ -30,7 +25,7 @@ const ShopByBrands = () => {
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
-      collection(db, "categories"),
+      collection(db, "brands"),
       (snapshot) => {
         const data = snapshot.docs.map((doc) => ({
           ...(doc.data() as Omit<Brand, "_id">),
@@ -50,9 +45,9 @@ const ShopByBrands = () => {
   if (!brands?.length) return null;
 
   return (
-    <section className="mb-2 rounded-2xl bg-surface p-5 lg:mb-6 lg:p-7">
-      <div className="mb-6 flex items-center justify-between">
-        <Title>Shop By Brands</Title>
+    <section className="w-full rounded-2xl bg-surface p-5 md:p-7">
+      <div className="mb-6 flex items-center justify-between border-b border-grey/60 pb-3">
+        <Title className="text-accent">Shop By Brands</Title>
 
         <Link
           href="/shop"

@@ -45,7 +45,7 @@ const ProductGrid = () => {
       <HomeTabBar selectedTab={selectedTab} onTabSelect={setSelectedTab} />
 
       {filteredProducts.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-3 lg:gap-4 w-full mt-7">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-3 lg:gap-4 w-full mt-4">
           <AnimatePresence>
             {filteredProducts.map((p) => (
               <motion.div key={p._id} layout>

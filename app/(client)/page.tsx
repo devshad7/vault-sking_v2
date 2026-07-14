@@ -12,14 +12,10 @@ const Home = () => {
     <>
       <HomeBanner />
 
-      <Container>
-        <div className="py-5">
-          <ProductGrid />
-        </div>
+      <Container className="py-5 md:py-8 flex flex-col gap-4 md:gap-6">
+        <ProductGrid />
         <HomeCategories />
-        <div className="py-5">
-          <ShopByBrands />
-        </div>
+        <ShopByBrands />
         <LatestBlog />
       </Container>
     </>
