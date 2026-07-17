@@ -26,10 +26,10 @@ export default function ProductUsage({
             How to Use
           </h3>
           <ul className="space-y-3">
-            {howToUse.map((step, index) => (
-              <li key={index} className="flex gap-4 items-start">
+            {howToUse.map((step, stepIndex) => (
+              <li key={step} className="flex gap-4 items-start">
                 <span className="flex items-center justify-center w-6 h-6 rounded-full bg-orange-100 text-orange-600 text-sm font-bold shrink-0">
-                  {index + 1}
+                  {stepIndex + 1}
                 </span>
                 <span className="text-gray-700 leading-relaxed">{step}</span>
               </li>
@@ -46,8 +46,8 @@ export default function ProductUsage({
         Warnings & Precautions
       </h3>
       <ul className="list-disc pl-5 space-y-2 text-red-700">
-        {warnings.map((warning, index) => (
-          <li key={index}>{warning}</li>
+        {warnings.map((warning) => (
+          <li key={warning}>{warning}</li>
         ))}
       </ul>
     </div>
@@ -60,8 +60,8 @@ export default function ProductUsage({
         Storage Instructions
       </h3>
       <ul className="list-disc pl-5 space-y-2 text-slate-700">
-        {storageInstructions.map((instruction, index) => (
-          <li key={index}>{instruction}</li>
+        {storageInstructions.map((instruction) => (
+          <li key={instruction}>{instruction}</li>
         ))}
       </ul>
     </div>

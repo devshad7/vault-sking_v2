@@ -7,7 +7,7 @@ const MobileMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
-   <button onClick = {() => setIsOpen(!isOpen)}>
+   <button type="button" onClick = {() => setIsOpen(!isOpen)}>
     <AlignLeft className="hover:text-accent hoverEffect md:hidden
     hover:cursor-pointer" />
    </button>

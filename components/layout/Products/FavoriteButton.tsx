@@ -21,6 +21,7 @@ const FavoriteButton = ({
 
   return (
     <button
+      type="button"
       onClick={handleFavorite}
       className="group relative hover:text-accent hoverEffect border border-accent/80 hover:border-accent p-1.5 rounded-sm"
       aria-label={isFavorite ? "Remove from wishlist" : "Add to wishlist"}

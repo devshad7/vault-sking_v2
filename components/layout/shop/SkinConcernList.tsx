@@ -55,7 +55,7 @@ className="flex items-center gap-2 h-8 px-1 rounded-md hover:bg-muted/40 cursor-
         })}
       </div>
       {selectedSkinConcerns.length > 0 && (
-        <button
+        <button type="button"
           onClick={() => setSelectedSkinConcerns([])}
           className="text-xs font-medium mt-3 block text-primary underline underline-offset-2 hover:text-accent hoverEffect"
         >

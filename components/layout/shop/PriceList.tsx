@@ -24,11 +24,11 @@ const PriceList = ({ selectedPrice, setSelectedPrice }: Props) => {
         value={selectedPrice || ""}
         onValueChange={(val) => setSelectedPrice(val)}
       >
-        {priceArray?.map((price, index) => {
+        {priceArray?.map((price) => {
           const isChecked = selectedPrice === price?.value;
           return (
             <div
-              key={index}
+              key={price.value}
               onClick={() => setSelectedPrice(price?.value)}
 className="flex items-center gap-2 h-8 px-1 rounded-md hover:bg-muted/40 cursor-pointer transition-colors"            >
               <RadioGroupItem
@@ -49,7 +49,7 @@ className="flex items-center gap-2 h-8 px-1 rounded-md hover:bg-muted/40 cursor-
         })}
       </RadioGroup>
       {selectedPrice && (
-        <button
+        <button type="button"
           onClick={() => setSelectedPrice(null)}
           className="text-xs font-medium mt-3 block text-primary underline underline-offset-2 hover:text-accent hoverEffect"
         >

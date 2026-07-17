@@ -6,6 +6,13 @@ import { Calendar } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Blog | Vault Skin",
+  description:
+    "Skincare tips, product guides, and beauty insights from Vault Skin — your trusted skincare destination in Nepal.",
+};
 
 const BlogPage = () => {
   const blogs = getAllBlogs();

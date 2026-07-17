@@ -44,33 +44,38 @@ export const useCart = () => {
   /**
    * Listen to Firestore when user signs in
    */
-  useEffect(() => {
-    if (!isSignedIn || !user) {
-      // User is guest - avoid calling setState synchronously inside effect
-      // schedule update on next tick to prevent cascading renders
-      setTimeout(() => setCart(getGuestCart()), 0);
-      return;
-    }
+ useEffect(() => {
+  if (!isSignedIn || !user) {
+    const timeoutId = window.setTimeout(() => {
+      setCart(getGuestCart());
+    }, 0);
 
-    let unsubscribe: (() => void) | undefined;
+    return () => clearTimeout(timeoutId);
+  }
 
-    const init = async () => {
-      setLoading(true);
+  let unsubscribe = () => {};
+  let cancelled = false;
 
-      await mergeGuestCart(user.id);
+  (async () => {
+    setLoading(true);
 
-      unsubscribe = listenFirestoreCart(user.id, (items) => {
+    await mergeGuestCart(user.id);
+
+    if (cancelled) return;
+
+    unsubscribe = listenFirestoreCart(user.id, (items) => {
+      if (!cancelled) {
         setCart(items);
         setLoading(false);
-      });
-    };
+      }
+    });
+  })();
 
-    init();
-
-    return () => {
-      unsubscribe?.();
-    };
-  }, [isSignedIn, user]);
+  return () => {
+    cancelled = true;
+    unsubscribe();
+  };
+}, [isSignedIn, user]);
 
   const addToCart = useCallback(
     async (product: Product) => {

@@ -36,7 +36,7 @@ const MissionVision = () => {
           </div>
           <h3 className="text-xl font-semibold text-accent mb-3">Our Vision</h3>
           <p className="text-base text-text-muted leading-relaxed">
-            To become Nepal's most trusted online destination for premium skincare.
+            To become Nepal&apos;s most trusted online destination for premium skincare.
           </p>
         </motion.div>
       </div>

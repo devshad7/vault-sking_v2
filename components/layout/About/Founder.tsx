@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Container from "@/components/Container";
-
+import Link from "next/link";
 const Founder = () => {
   return (
     <Container className="py-6 lg:py-10">
@@ -34,25 +34,23 @@ const Founder = () => {
             Founder, Vault Skin
           </p>
 
-          <div className="mt-6 space-y-3 text-base leading-8 text-text-muted">
-            <p>
-              Vault Skin was established with a simple purpose—to make authentic,
-              high-quality skincare products easily accessible to customers
-              across Nepal.
-            </p>
 
-            <p>
-              We carefully select products from trusted brands, ensuring every
-              item meets our standards for quality, authenticity, and customer
-              satisfaction.
-            </p>
-
-            <p>
-              As we continue to grow, our focus remains the same: providing a
-              reliable shopping experience backed by genuine products,
-              transparent service, and customer-first support.
-            </p>
-          </div>
+          <p>
+            Vault Enterprises Pvt. Ltd. is a Nepal-based company specializing in the
+            import and distribution of premium skincare and beauty products. As the
+            authorized importer and distributor of{" "}
+            <Link
+              href="https://www.skininspired.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-primary hover:underline"
+            >
+              SkinInspired
+            </Link>{" "}
+            skincare products from India, we bring dermatologist-inspired, high-quality
+            skincare solutions designed to address a wide range of skin concerns while
+            ensuring authenticity, quality, and customer satisfaction.
+          </p>
         </div>
       </div>
     </Container>

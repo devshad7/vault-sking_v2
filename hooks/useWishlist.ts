@@ -33,30 +33,37 @@ export const useWishlist = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!isSignedIn || !user) {
-      setTimeout(() => setWishlistIds(getGuestWishlist()), 0);
-      return;
-    }
+  if (!isSignedIn || !user) {
+    const timeoutId = window.setTimeout(() => {
+      setWishlistIds(getGuestWishlist());
+    }, 0);
 
-    let unsubscribe: (() => void) | undefined;
+    return () => window.clearTimeout(timeoutId);
+  }
 
-    const init = async () => {
-      setLoading(true);
+  let unsubscribe = () => {};
+  let cancelled = false;
 
-      await mergeGuestWishlist(user.id);
+  (async () => {
+    setLoading(true);
 
-      unsubscribe = listenFirestoreWishlist(user.id, (items) => {
-        setWishlistIds(items.map((item) => item.productId));
-        setLoading(false);
-      });
-    };
+    await mergeGuestWishlist(user.id);
 
-    init();
+    if (cancelled) return;
 
-    return () => {
-      unsubscribe?.();
-    };
-  }, [isSignedIn, user]);
+    unsubscribe = listenFirestoreWishlist(user.id, (items) => {
+      if (cancelled) return;
+
+      setWishlistIds(items.map((item) => item.productId));
+      setLoading(false);
+    });
+  })();
+
+  return () => {
+    cancelled = true;
+    unsubscribe();
+  };
+}, [isSignedIn, user]);
 
   const addToWishlist = useCallback(
     async (product: Product) => {

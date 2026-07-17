@@ -23,8 +23,8 @@ export default function ProductIngredients({
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {ingredients.map((ingredient, index) => (
-            <tr key={index} className="hover:bg-gray-50 transition-colors">
+          {ingredients.map((ingredient) => (
+            <tr key={ingredient.title} className="hover:bg-gray-50 transition-colors">
               <td className="p-4 font-medium text-gray-900 border-r border-gray-200">
                 {ingredient.title}
               </td>

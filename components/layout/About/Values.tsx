@@ -29,7 +29,7 @@ const Values = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {values.map((value, index) => (
           <motion.div
-            key={index}
+            key={value.title}
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}

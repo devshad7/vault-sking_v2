@@ -15,6 +15,11 @@ import ProductCard from "../Products/ProductCard";
 import { motion, AnimatePresence } from "framer-motion";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "@/config/firebase.config";
+import {
+  buildCategoryLookup,
+  productMatchesBrandSlug,
+  productMatchesCategorySlug,
+} from "@/utils/categoryHelper";
 
 interface Props {
   categories: Category[];
@@ -31,6 +36,48 @@ const Shop = ({ categories, brands }: Props) => {
   const loading = false;
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [firestoreCategories, setFirestoreCategories] = useState<Category[]>(
+    [],
+  );
+  const [firestoreBrands, setFirestoreBrands] = useState<Brand[]>([]);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      collection(db, "categories"),
+      (snapshot) => {
+        const data = snapshot.docs.map((doc) => ({
+          ...(doc.data() as Omit<Category, "_id">),
+          _id: doc.id,
+        }));
+
+        setFirestoreCategories(data);
+      },
+      (error) => {
+        console.error(error);
+      },
+    );
+
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      collection(db, "brands"),
+      (snapshot) => {
+        const data = snapshot.docs.map((doc) => ({
+          ...(doc.data() as Omit<Brand, "_id">),
+          _id: doc.id,
+        }));
+
+        setFirestoreBrands(data);
+      },
+      (error) => {
+        console.error(error);
+      },
+    );
+
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -147,23 +194,61 @@ const Shop = ({ categories, brands }: Props) => {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSearchQuery(queryParam);
-  }, [queryParam]);
+    setSelectedCategories(categoryParams ? [categoryParams] : []);
+  }, [categoryParams]);
 
-  // Client-side filtering for concerns and benefits
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSelectedBrands(brandParams ? [brandParams] : []);
+  }, [brandParams]);
+
+  const displayCategories =
+    firestoreCategories.length > 0 ? firestoreCategories : categories;
+  const displayBrands = firestoreBrands.length > 0 ? firestoreBrands : brands;
+
+  const categoryLookup = useMemo(
+    () => buildCategoryLookup([...categories, ...firestoreCategories]),
+    [categories, firestoreCategories],
+  );
+
+  // Client-side filtering for all active filters
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const text = `${product.name} ${product.description || ""}`.toLowerCase();
 
+      // --- Search query filter ---
+      if (searchQuery.trim().length > 0) {
+        const q = searchQuery.trim().toLowerCase();
+        if (!text.includes(q)) return false;
+      }
+
+      // --- Category filter ---
+      if (selectedCategories.length > 0) {
+        const matches = selectedCategories.some((categorySlug) =>
+          productMatchesCategorySlug(product, categorySlug, categoryLookup),
+        );
+
+        if (!matches) return false;
+      }
+
+      // --- Brand filter ---
       if (selectedBrands.length > 0) {
-        const normalize = (s?: string) =>
-          s?.toLowerCase().replace(/[\s-]/g, "") || "";
-        const matches = selectedBrands.some(
-          (b) => normalize(product.brand) === normalize(b),
+        const matches = selectedBrands.some((brandSlug) =>
+          productMatchesBrandSlug(product, brandSlug, displayBrands),
         );
         if (!matches) return false;
       }
 
+      // --- Price range filter ---
+      if (selectedPrice) {
+        const [minStr, maxStr] = selectedPrice.split("-");
+        const min = Number(minStr);
+        const max = Number(maxStr);
+        const price = product.price ?? 0;
+        if (price < min || price > max) return false;
+      }
+
+      // --- Skin concern filter ---
       if (selectedSkinConcerns.length > 0) {
         const keywords: Record<string, string[]> = {
           acne: [
@@ -214,6 +299,7 @@ const Shop = ({ categories, brands }: Props) => {
         if (!matches) return false;
       }
 
+      // --- Benefits filter ---
       if (selectedBenefits.length > 0) {
         const keywords: Record<string, string[]> = {
           hydration: [
@@ -258,7 +344,17 @@ const Shop = ({ categories, brands }: Props) => {
 
       return true;
     });
-  }, [products, selectedBrands, selectedSkinConcerns, selectedBenefits]);
+  }, [
+    products,
+    searchQuery,
+    selectedCategories,
+    selectedBrands,
+    selectedPrice,
+    selectedSkinConcerns,
+    selectedBenefits,
+    categoryLookup,
+    displayBrands,
+  ]);
 
   // Client-side sorting
   const sortedProducts = useMemo(() => {
@@ -308,7 +404,7 @@ const Shop = ({ categories, brands }: Props) => {
                 : "Shop Products"}
             </Title>
             {searchQuery && (
-              <button
+              <button type="button"
                 onClick={() => {
                   setSearchQuery("");
                   router.push("/shop");
@@ -346,7 +442,7 @@ const Shop = ({ categories, brands }: Props) => {
 
         {/* Mobile Top Bar */}
         <div className="md:hidden flex items-center justify-between py-3 px-4 border border-border/40 bg-white rounded-xl mb-4 select-none">
-          <button
+          <button type="button"
             onClick={openMobileDrawer}
             className="flex items-center gap-2 text-sm font-semibold text-primary py-2 px-3 border border-border/40 rounded-lg bg-gray-50/50 active:bg-gray-100 transition-colors cursor-pointer"
           >
@@ -379,7 +475,7 @@ const Shop = ({ categories, brands }: Props) => {
         {searchQuery && (
           <div className="md:hidden flex items-center justify-between px-4 py-2.5 border border-border/40 bg-gray-50 rounded-xl mb-4 text-xs font-semibold text-text">
             <span>Search query: &ldquo;{searchQuery}&rdquo;</span>
-            <button
+            <button type="button"
               onClick={() => {
                 setSearchQuery("");
                 router.push("/shop");
@@ -416,7 +512,7 @@ const Shop = ({ categories, brands }: Props) => {
                 Filter Products
               </span>
               {activeFiltersCount > 0 && (
-                <button
+                <button type="button"
                   onClick={resetAllFilters}
                   className="text-xs font-semibold text-primary underline underline-offset-2 hover:text-accent hoverEffect cursor-pointer"
                 >
@@ -425,12 +521,12 @@ const Shop = ({ categories, brands }: Props) => {
               )}
             </div>
             <CategoryList
-              categories={categories}
+              categories={displayCategories}
               selectedCategories={selectedCategories}
               setSelectedCategories={setSelectedCategories}
             />
             <BrandList
-              brands={brands}
+              brands={displayBrands}
               selectedBrands={selectedBrands}
               setSelectedBrands={setSelectedBrands}
             />
@@ -502,7 +598,7 @@ const Shop = ({ categories, brands }: Props) => {
               {/* Drawer Header */}
               <div className="px-6 border-b border-border/30 flex items-center justify-between shrink-0">
                 <h3 className="text-lg font-bold text-text">Filter Products</h3>
-                <button
+                <button type="button"
                   onClick={closeMobileDrawer}
                   className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 active:bg-gray-100 text-text-muted hover:text-text cursor-pointer transition-colors"
                 >
@@ -514,7 +610,7 @@ const Shop = ({ categories, brands }: Props) => {
               <div className="flex-1 overflow-y-auto px-6 py-1">
                 {/* Categories */}
                 <div className="border-b border-border/30">
-                  <button
+                  <button type="button"
                     onClick={() => toggleSection("categories")}
                     className="w-full flex items-center justify-between py-1 text-sm font-semibold text-text select-none text-left cursor-pointer"
                   >
@@ -545,7 +641,7 @@ const Shop = ({ categories, brands }: Props) => {
                       >
                         <div className="pb-1">
                           <CategoryList
-                            categories={categories}
+                            categories={displayCategories}
                             selectedCategories={draftCategories}
                             setSelectedCategories={setDraftCategories}
                           />
@@ -557,7 +653,7 @@ const Shop = ({ categories, brands }: Props) => {
 
                 {/* Brands */}
                 <div className="border-b border-border/30">
-                  <button
+                  <button type="button"
                     onClick={() => toggleSection("brands")}
                     className="w-full flex items-center justify-between py-4 text-sm font-semibold text-text select-none text-left cursor-pointer"
                   >
@@ -587,7 +683,7 @@ const Shop = ({ categories, brands }: Props) => {
                       >
                         <div className="pb-4">
                           <BrandList
-                            brands={brands}
+                            brands={displayBrands}
                             selectedBrands={draftBrands}
                             setSelectedBrands={setDraftBrands}
                           />
@@ -599,7 +695,7 @@ const Shop = ({ categories, brands }: Props) => {
 
                 {/* Price */}
                 <div className="border-b border-border/30">
-                  <button
+                  <button type="button"
                     onClick={() => toggleSection("price")}
                     className="w-full flex items-center justify-between py-4 text-sm font-semibold text-text select-none text-left cursor-pointer"
                   >
@@ -637,7 +733,7 @@ const Shop = ({ categories, brands }: Props) => {
 
                 {/* Skin Concerns */}
                 <div className="border-b border-border/30">
-                  <button
+                  <button type="button"
                     onClick={() => toggleSection("concern")}
                     className="w-full flex items-center justify-between py-4 text-sm font-semibold text-text select-none text-left cursor-pointer"
                   >
@@ -679,7 +775,7 @@ const Shop = ({ categories, brands }: Props) => {
 
                 {/* Benefits */}
                 <div className="border-b border-border/30">
-                  <button
+                  <button type="button"
                     onClick={() => toggleSection("benefits")}
                     className="w-full flex items-center justify-between py-4 text-sm font-semibold text-text select-none text-left cursor-pointer"
                   >
@@ -721,13 +817,13 @@ const Shop = ({ categories, brands }: Props) => {
 
               {/* Drawer Footer (Sticky bottom buttons) */}
               <div className="border-t border-border/30 p-4 bg-white flex items-center justify-between gap-4 shrink-0">
-                <button
+                <button type="button"
                   onClick={resetMobileFilters}
                   className="w-1/2 py-3.5 border border-border rounded-xl text-sm font-semibold text-text-muted hover:text-text active:bg-gray-50 transition-colors cursor-pointer"
                 >
                   Reset All
                 </button>
-                <button
+                <button type="button"
                   onClick={applyMobileFilters}
                   className="w-1/2 py-3.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/95 transition-colors cursor-pointer"
                 >

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Title from "../Products/Title";
 import { Checkbox } from "../../ui/checkbox";
 import { Label } from "../../ui/label";
+import { getSlugValue } from "@/utils/categoryHelper";
 
 interface Props {
   categories: Category[];
@@ -29,7 +30,8 @@ const CategoryList = ({
     <div className="w-full py-3 border-b border-border/20 last:border-none">      <Title className="text-sm font-semibold text-zinc-900 mb-2">Product Categories</Title>
       <div className="space-y-1">
         {visibleCategories?.map((category) => {
-          const slug = category?.slug?.current as string;
+          const slug = getSlugValue(category?.slug);
+          if (!slug) return null;
           const isChecked = selectedCategories.includes(slug);
           return (
             <div
@@ -57,7 +59,7 @@ const CategoryList = ({
       </div>
 
       {categories?.length > 5 && (
-        <button
+        <button type="button"
           onClick={() => setShowAll(!showAll)}
           className="text-xs font-semibold mt-3 text-primary/80 hover:text-primary hoverEffect cursor-pointer flex items-center gap-1 py-1"
         >
@@ -66,7 +68,7 @@ const CategoryList = ({
       )}
 
       {selectedCategories.length > 0 && (
-        <button
+        <button type="button"
           onClick={() => setSelectedCategories([])}
           className="text-xs font-medium mt-3 block text-primary underline underline-offset-2 hover:text-accent hoverEffect"
         >

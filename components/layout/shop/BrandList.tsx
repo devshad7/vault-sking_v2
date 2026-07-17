@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Title from "../Products/Title";
 import { Checkbox } from "../../ui/checkbox";
 import { Label } from "../../ui/label";
+import { getSlugValue } from "@/utils/categoryHelper";
 
 interface Props {
   brands: Brand[];
@@ -26,7 +27,8 @@ const BrandList = ({ brands, selectedBrands, setSelectedBrands }: Props) => {
 <Title className="text-base font-bold text-text mb-3">Brands</Title>
       <div className="space-y-0.5">
         {visibleBrands?.map((brand) => {
-          const slug = brand?.slug?.current as string;
+          const slug = getSlugValue(brand?.slug);
+          if (!slug) return null;
           const isChecked = selectedBrands.includes(slug);
           return (
             <div
@@ -53,7 +55,7 @@ className="flex items-center gap-2 h-8 px-1 rounded-md hover:bg-muted/40 cursor-
       </div>
 
       {brands?.length > 5 && (
-        <button
+        <button type="button"
           onClick={() => setShowAll(!showAll)}
           className="text-xs font-semibold mt-3 text-primary/80 hover:text-primary hoverEffect cursor-pointer flex items-center gap-1 py-1"
         >
@@ -62,7 +64,7 @@ className="flex items-center gap-2 h-8 px-1 rounded-md hover:bg-muted/40 cursor-
       )}
 
       {selectedBrands.length > 0 && (
-        <button
+        <button type="button"
           onClick={() => setSelectedBrands([])}
           className="text-xs font-medium mt-3 block text-primary underline underline-offset-2 hover:text-accent hoverEffect"
         >

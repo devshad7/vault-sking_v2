@@ -69,9 +69,10 @@ const ImageView = ({ images = [], isStock }: Props) => {
       </div>
 
       <div className="flex flex-wrap gap-3">
-        {validImages.map((image, idx) => (
+        {validImages.map((image) => (
           <button
-            key={idx}
+            key={image.src}
+            type="button"
             onClick={() => setActive(image)}
             className={`
               h-20

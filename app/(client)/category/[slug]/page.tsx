@@ -3,6 +3,25 @@ import Container from "@/components/Container";
 import Title from "@/components/layout/Products/Title";
 import { getCategories } from "@/lib/frontend-data";
 import React from "react";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const category = getCategories().find((item) => item.slug.current === slug);
+
+  return {
+    title: category
+      ? `${category.title} | Vault Skin`
+      : `${slug} | Vault Skin`,
+    description:
+      category?.description ||
+      `Browse ${category?.title ?? slug} skincare products at Vault Skin.`,
+  };
+}
 
 const CategoryPage = async ({
   params,

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { nepalProvinces } from "@/data/district";
+import DistrictCombobox from "./district-combobox";
 
 interface AddressFormProps {
   formData: {
@@ -54,6 +57,9 @@ const AddressForm = ({
   mockSavedAddresses,
   setShowAddressForm,
 }: AddressFormProps) => {
+  // Province is a local filter only — it narrows the district list below,
+  // it isn't persisted as part of the address itself.
+  const [selectedProvince, setSelectedProvince] = useState<string>("");
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
@@ -111,7 +117,45 @@ const AddressForm = ({
         />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div className="space-y-2">
+          <label htmlFor="province" className="text-sm font-medium">
+            Province
+          </label>
+          <Select
+            value={selectedProvince}
+            onValueChange={(value) => {
+              setSelectedProvince(value ?? "");
+              // Clear the district if it no longer matches the chosen province
+              handleDistrictChange(null);
+            }}
+          >
+            <SelectTrigger id="province" >
+              <SelectValue placeholder="Select province" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              {nepalProvinces.map((province) => (
+                <SelectItem key={province.value} value={province.value}>
+                  {province.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid ">
+          <label htmlFor="district" className="text-sm font-medium">
+            District
+          </label>
+          <DistrictCombobox
+            id="district"
+            value={formData.district}
+            onChange={handleDistrictChange}
+            province={selectedProvince}
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <label htmlFor="city" className="text-sm font-medium">
             City / Town
@@ -123,25 +167,6 @@ const AddressForm = ({
             value={formData.city}
             onChange={handleInputChange}
           />
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="district" className="text-sm font-medium">
-            District
-          </label>
-          <Select
-            value={formData.district}
-            onValueChange={handleDistrictChange}
-          >
-            <SelectTrigger id="district">
-              <SelectValue placeholder="Select district" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="kathmandu">Kathmandu</SelectItem>
-              <SelectItem value="bhaktapur">Bhaktapur</SelectItem>
-              <SelectItem value="lalitpur">Lalitpur</SelectItem>
-              <SelectItem value="pokhara">Pokhara</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
         <div className="space-y-2">
           <label htmlFor="zipCode" className="text-sm font-medium">

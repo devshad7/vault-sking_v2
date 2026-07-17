@@ -1,6 +1,6 @@
 import Navbar from "@/components/layout/Navbar/Navbar";
 import "../globals.css";
-import Footer from "@/components/layout/Footer/Footer";
+import FooterWrapper from "@/components/layout/Footer/FooterWrapper";
 import Header from "@/components/layout/Navbar/Header";
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
       <Header />
       <Navbar />
       <main className="flex-1">{children}</main>
-      <Footer />
+      <FooterWrapper />
     </div>
   );
 }

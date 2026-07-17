@@ -15,6 +15,14 @@ import {
 
 import { db } from "@/config/firebase.config";
 
+export const paymentMethods = ["cod", "qr"] as const;
+
+export type PaymentMethod = (typeof paymentMethods)[number];
+
+export const paymentStatuses = ["pending", "verified", "rejected"] as const;
+
+export type PaymentStatus = (typeof paymentStatuses)[number];
+
 export interface ShippingAddress {
   fullName: string;
   phone: string;
@@ -75,8 +83,11 @@ export interface CustomerOrder {
   shippingAddress: ShippingAddress;
 
   payment: {
-    method: "cash";
+    method: PaymentMethod;
     verified: boolean;
+    status: PaymentStatus;
+    transactionId: string;
+    paymentScreenshot: string;
   };
 
   totals: {
@@ -98,7 +109,11 @@ export interface CustomerOrder {
 export interface PlaceOrderInput {
   userId: string;
 
-  paymentMethod: "cash";
+  paymentMethod: PaymentMethod;
+
+  transactionId?: string;
+
+  paymentScreenshot?: string;
 
   shippingAddress: ShippingAddress;
 
@@ -122,6 +137,14 @@ const numberValue = (value: unknown) =>
 
 const timestampValue = (value: unknown): Timestamp | null =>
   value instanceof Timestamp ? value : null;
+
+const isPaymentMethod = (value: unknown): value is PaymentMethod =>
+  typeof value === "string" &&
+  paymentMethods.includes(value as PaymentMethod);
+
+const isPaymentStatus = (value: unknown): value is PaymentStatus =>
+  typeof value === "string" &&
+  paymentStatuses.includes(value as PaymentStatus);
 
 const isCustomerOrderStatus = (
   value: unknown,
@@ -181,8 +204,11 @@ const toCustomerOrder = (id: string, data: DocumentData): CustomerOrder => {
       zipCode: stringValue(shippingAddress.zipCode),
     },
     payment: {
-      method: "cash",
+      method: isPaymentMethod(payment.method) ? payment.method : "cod",
       verified: payment.verified === true,
+      status: isPaymentStatus(payment.status) ? payment.status : "pending",
+      transactionId: stringValue(payment.transactionId),
+      paymentScreenshot: stringValue(payment.paymentScreenshot),
     },
     totals: {
       subtotal: numberValue(totals.subtotal),
@@ -299,6 +325,8 @@ const generateOrderNumber = () => {
 export const placeOrder = async ({
   userId,
   paymentMethod,
+  transactionId,
+  paymentScreenshot,
   shippingAddress,
   items,
 }: PlaceOrderInput) => {
@@ -365,6 +393,9 @@ export const placeOrder = async ({
       payment: {
         method: paymentMethod,
         verified: false,
+        status: "pending",
+        transactionId: transactionId ?? "",
+        paymentScreenshot: paymentScreenshot ?? "",
       },
 
       totals: {

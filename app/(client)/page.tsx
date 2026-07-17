@@ -12,7 +12,7 @@ const Home = () => {
     <>
       <HomeBanner />
 
-      <Container className="py-5 md:py-8 flex flex-col gap-4 md:gap-6">
+      <Container className="py-8 md:py-12 flex flex-col gap-4 md:gap-6">
         <ProductGrid />
         <HomeCategories />
         <ShopByBrands />

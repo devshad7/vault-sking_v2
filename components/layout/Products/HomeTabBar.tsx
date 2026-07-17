@@ -57,6 +57,7 @@ const HomeTabBar = ({ selectedTab, onTabSelect }: Props) => {
           const isActive = selectedTab === item._id;
           return (
             <button
+              type="button"
               key={item._id}
               role="tab"
               aria-selected={isActive}

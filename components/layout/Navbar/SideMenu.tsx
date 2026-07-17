@@ -19,7 +19,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
       className="min-w-72 max-w-96 bg-black h-screen border-r border-r-accent p-10 flex-col gap-6">
         <div className="flex items-center         justify-between gap-5">
          
-          <button className="text-white hover:text-accent hoverEffect" onClick={onClose}>
+          <button type="button" className="text-white hover:text-accent hoverEffect" onClick={onClose}>
             <X />
           </button>
         </div>

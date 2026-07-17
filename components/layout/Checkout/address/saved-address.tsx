@@ -9,6 +9,7 @@ interface SavedAddress {
   phone: string;
   email: string;
   address: string;
+  province:string;
   city: string;
   district: string;
   zipCode: string;
@@ -54,6 +55,7 @@ const SavedAddress = ({
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {addr.city},{" "}
+                  {addr.province},{" "}
                   {addr.district.charAt(0).toUpperCase() +
                     addr.district.slice(1)}{" "}
                   {addr.zipCode}

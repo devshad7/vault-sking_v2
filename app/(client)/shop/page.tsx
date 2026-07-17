@@ -2,6 +2,13 @@ import Shop from "@/components/layout/shop/Shop";
 import { getBrands, getCategories } from "@/lib/frontend-data";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Shop | Vault Skin",
+  description:
+    "Browse authentic skincare products from trusted brands at Vault Skin. Filter by category, brand, price, and more.",
+};
 
 const ShopPage = () => {
   const categories = getCategories();

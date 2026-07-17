@@ -134,7 +134,7 @@ export default function SearchModal({
               {loading && (
                 <span className="text-xs text-gray-400 animate-pulse">Searching…</span>
               )}
-              <button
+              <button type="button"
                 aria-label="Close search"
                 onClick={onClose}
                 className="flex-shrink-0 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
@@ -161,7 +161,7 @@ export default function SearchModal({
                       "Hydrating Moisturizer",
                     ].map((term) => (
                       <li key={term}>
-                        <button
+                        <button type="button"
                           onClick={() => setQuery(term)}
                           className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
                         >
@@ -213,7 +213,7 @@ export default function SearchModal({
 
                     {/* View all matching products link */}
                     <div className="p-2 border-t border-gray-100 bg-gray-50/50">
-                      <button
+                      <button type="button"
                         onClick={() => onSubmit(query)}
                         className="w-full text-center py-2.5 bg-white hover:bg-gray-100 text-xs font-semibold text-primary rounded-xl border border-gray-200/80 shadow-sm transition-all"
                       >

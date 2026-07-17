@@ -14,17 +14,19 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ShieldCheck } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ShieldCheck, Truck } from "lucide-react";
 import Container from "@/components/Container";
 import SavedAddress from "./address/saved-address";
 import AddressForm from "./address/address-form";
+import QrPayment from "./QrPayment";
 import {
   getAddresses,
   saveAddress as persistAddress,
 } from "@/lib/addressService";
 import { useCart } from "@/hooks/useCart";
 import { CartProduct, getCartProducts } from "@/utils/cartHelper";
-import { placeOrder } from "@/lib/orderService";
+import { placeOrder, type PaymentMethod } from "@/lib/orderService";
 import Image from "next/image";
 
 interface SavedAddressData {
@@ -34,6 +36,7 @@ interface SavedAddressData {
   phone: string;
   email: string;
   address: string;
+  province: string;
   city: string;
   district: string;
   zipCode: string;
@@ -81,6 +84,7 @@ export default function Checkout() {
             email: address.email,
             address: address.address,
             city: address.city,
+            province: address.province,
             district: address.district,
             zipCode: address.zipCode,
           })),
@@ -109,12 +113,18 @@ export default function Checkout() {
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
     null,
   );
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
+  const [transactionId, setTransactionId] = useState("");
+  const [paymentScreenshot, setPaymentScreenshot] = useState<File | null>(
+    null,
+  );
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
     email: "",
     address: "",
+    province: "",
     city: "",
     district: "",
     zipCode: "",
@@ -147,6 +157,7 @@ export default function Checkout() {
       phone: address.phone,
       email: address.email,
       address: address.address,
+      province: address.province,
       city: address.city,
       district: address.district,
       zipCode: address.zipCode,
@@ -161,6 +172,7 @@ export default function Checkout() {
       phone: "",
       email: "",
       address: "",
+      province: "",
       city: "",
       district: "",
       zipCode: "",
@@ -193,6 +205,7 @@ export default function Checkout() {
             phone: formData.phone.trim(),
             email: formData.email.trim(),
             address: formData.address.trim(),
+            province: formData.province.trim(),
             city: formData.city.trim(),
             district: formData.district.trim(),
             zipCode: formData.zipCode.trim(),
@@ -210,6 +223,7 @@ export default function Checkout() {
               phone: address.phone,
               email: address.email,
               address: address.address,
+              province: address.province,
               city: address.city,
               district: address.district,
               zipCode: address.zipCode,
@@ -245,6 +259,12 @@ export default function Checkout() {
     if (!formData.district) errors.district = "District is required";
     if (!formData.zipCode.trim()) errors.zipCode = "ZIP code is required";
     if (cartProducts.length === 0) errors.cart = "Your cart is empty";
+    if (paymentMethod === "qr") {
+      if (!transactionId.trim())
+        errors.transactionId = "Transaction ID is required";
+      if (!paymentScreenshot)
+        errors.paymentScreenshot = "Payment screenshot is required";
+    }
     return errors;
   };
 
@@ -255,7 +275,10 @@ export default function Checkout() {
       try {
         const orderId = await placeOrder({
           userId: user?.id ?? `guest-${Date.now()}`,
-          paymentMethod: "cash",
+          paymentMethod,
+          transactionId: paymentMethod === "qr" ? transactionId.trim() : undefined,
+          paymentScreenshot:
+            paymentMethod === "qr" ? paymentScreenshot?.name : undefined,
           shippingAddress: {
             fullName: formData.fullName.trim(),
             phone: formData.phone.trim(),
@@ -287,7 +310,11 @@ export default function Checkout() {
 
         setPlacedOrderId(orderId);
         setFormErrors({});
-        toast.success("Order placed successfully. Cash on delivery selected.");
+        toast.success(
+          paymentMethod === "qr"
+            ? "Order placed successfully. We'll verify your payment shortly."
+            : "Order placed successfully. Cash on delivery selected.",
+        );
       } catch (error) {
         const message =
           error instanceof Error
@@ -312,14 +339,15 @@ export default function Checkout() {
             <Card className="border-border/70 shadow-sm">
               <CardHeader className="space-y-3">
                 <Badge variant="secondary" className="w-fit">
-                  Cash on Delivery
+                  {paymentMethod === "qr" ? "Manual QR Payment" : "Cash on Delivery"}
                 </Badge>
                 <CardTitle className="text-3xl tracking-tight">
                   Order confirmed
                 </CardTitle>
                 <CardDescription className="text-base">
-                  Your checkout is complete. We have received your COD order and
-                  will contact you using the details you provided.
+                  {paymentMethod === "qr"
+                    ? "Your checkout is complete. We have received your order and will verify your payment manually before dispatch."
+                    : "Your checkout is complete. We have received your COD order and will contact you using the details you provided."}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-5">
@@ -346,10 +374,10 @@ export default function Checkout() {
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => router.push("/")}
+                    onClick={() => router.push("/order")}
                     className="flex-1"
                   >
-                    Go to Home
+                    View My Orders
                   </Button>
                 </div>
               </CardContent>
@@ -426,28 +454,91 @@ export default function Checkout() {
                     <div>
                       <CardTitle className="text-lg">Payment Method</CardTitle>
                       <CardDescription>
-                        Cash on delivery is the only available option right now.
+                        Choose how you&apos;d like to pay for your order.
                       </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white">
-                        <ShieldCheck className="h-5 w-5" />
-                      </div>
-                      <div className="space-y-1">
-                        <p className="font-semibold">Cash on delivery</p>
-                        <p className="text-sm text-muted-foreground">
-                          Pay in cash when your order is delivered. No QR scan,
-                          transaction ID, or upload step is required.
-                        </p>
+                <CardContent className="space-y-3">
+                  <RadioGroup
+                    value={paymentMethod}
+                    onValueChange={(value) =>
+                      setPaymentMethod(value as PaymentMethod)
+                    }
+                  >
+                    <div
+                      onClick={() => setPaymentMethod("cod")}
+                      className={`rounded-xl border p-4 cursor-pointer transition-colors ${
+                        paymentMethod === "cod"
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <RadioGroupItem value="cod" id="payment-cod" />
+                        <div className="mt-0.5 hidden  md:flex h-10 w-10 items-center  justify-center rounded-full bg-primary text-white">
+                          <Truck className="h-5 w-5" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="font-semibold">Cash on delivery</p>
+                          <p className="text-sm text-muted-foreground">
+                            Pay in cash when your order is delivered. No QR
+                            scan, transaction ID, or upload step is required.
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
+
+                    <div
+                      onClick={() => setPaymentMethod("qr")}
+                      className={`rounded-xl border p-4 cursor-pointer transition-colors ${
+                        paymentMethod === "qr"
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <RadioGroupItem value="qr" id="payment-qr" />
+                        <div className="mt-0.5 hidden  md:flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white">
+                          <ShieldCheck className="h-5 w-5" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="font-semibold">Manual QR Payment</p>
+                          <p className="text-sm text-muted-foreground">
+                            Scan the QR code, pay via your wallet app, and
+                            submit your transaction ID and screenshot for
+                            verification.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </RadioGroup>
                 </CardContent>
               </Card>
+
+              {paymentMethod === "qr" && (
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg">Scan &amp; Pay via QR</CardTitle>
+                    <CardDescription>
+                      Complete your payment and submit the details below.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <QrPayment
+                      amount={total}
+                      merchantName="Vault Enterprises Pvt. Ltd."
+                      walletName="Bank"
+                      walletNumber="9800000000"
+                      transactionId={transactionId}
+                      onTransactionIdChange={setTransactionId}
+                      screenshot={paymentScreenshot}
+                      onScreenshotChange={setPaymentScreenshot}
+                      errors={formErrors}
+                    />
+                  </CardContent>
+                </Card>
+              )}
 
               {formErrors.cart && (
                 <p className="text-xs text-red-600">{formErrors.cart}</p>
@@ -469,7 +560,9 @@ export default function Checkout() {
                   !formData.city ||
                   !formData.district ||
                   !formData.zipCode ||
-                  cartProducts.length === 0
+                  cartProducts.length === 0 ||
+                  (paymentMethod === "qr" &&
+                    (!transactionId.trim() || !paymentScreenshot))
                 }
               >
                 {isSubmitting ? "Placing Order..." : "Confirm Order"}
@@ -478,8 +571,9 @@ export default function Checkout() {
               {/* Information Alert */}
               <Alert className="bg-yellow-50 border-yellow-200">
                 <AlertDescription className="text-yellow-800 text-sm">
-                  Cash on delivery is active. Please make sure your phone number
-                  and address are correct before placing the order.
+                  {paymentMethod === "qr"
+                    ? "Manual QR payment is active. Please double-check your transaction ID and screenshot before placing the order."
+                    : "Cash on delivery is active. Please make sure your phone number and address are correct before placing the order."}
                 </AlertDescription>
               </Alert>
             </div>
@@ -557,9 +651,15 @@ export default function Checkout() {
                   <div className="bg-muted p-3 rounded-lg flex gap-2 text-sm">
                     <ShieldCheck className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-semibold text-xs">100% Secure COD</p>
+                      <p className="font-semibold text-xs">
+                        {paymentMethod === "qr"
+                          ? "100% Secure Manual QR Payment"
+                          : "100% Secure COD"}
+                      </p>
                       <p className="text-xs text-muted-foreground">
-                        Your order will be confirmed and processed for delivery.
+                        {paymentMethod === "qr"
+                          ? "Your order will be verified manually after payment confirmation."
+                          : "Your order will be confirmed and processed for delivery."}
                       </p>
                     </div>
                   </div>

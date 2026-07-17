@@ -275,8 +275,8 @@ const OrderDetailPage = () => {
             </CardHeader>
             <CardContent>
               <ol className="space-y-5">
-                {order.timeline.map((entry, index) => (
-                  <li key={`${entry.status}-${index}`} className="flex gap-3">
+                {order.timeline.map((entry) => (
+                  <li key={`${entry.status}-${String(entry.at)}`} className="flex gap-3">
                     <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                     <div>
                       <p className="font-medium">{formatStatus(entry.status)}</p>

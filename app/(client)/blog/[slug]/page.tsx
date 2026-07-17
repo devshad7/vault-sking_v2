@@ -11,6 +11,27 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import React from "react";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const blog = getSingleBlog(slug);
+
+  if (!blog) {
+    return { title: "Blog | Vault Skin" };
+  }
+
+  return {
+    title: `${blog.title} | Vault Skin`,
+    description:
+      blog.body?.slice(0, 160) ||
+      `Read ${blog.title} on the Vault Skin blog.`,
+  };
+}
 
 const SingleBlogPage = async ({
   params,
@@ -106,10 +127,10 @@ const BlogLeft = async ({ slug }: { slug: string }) => {
       <div className="border border-black p-5 rounded-md mt-10">
         <Title className="text-base">Latest Blogs</Title>
         <div className="space-y-4 mt-4">
-          {blogs?.map((blog, index) => (
+          {blogs?.map((blog) => (
             <Link
               href={`/blog/${blog?.slug?.current}`}
-              key={index}
+              key={blog._id}
               className="flex items-center gap-2 group"
             >
               {blog?.mainImage && (

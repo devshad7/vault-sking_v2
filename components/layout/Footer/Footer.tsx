@@ -95,11 +95,16 @@ const Footer = () => {
             </form>
           </div>
         </div>
-        <div className="py-6 border-t border-accent/90 text-center text-sm text-primary">
+        <div className=" flex flex-row justify-between items-center py-5 text-lg border-t border-accent/90 text-center text-sm text-primary">
           <div className="flex flex-col items-center gap-2">
             <p>
               © {new Date().getFullYear()} Vault Enterprises. All rights
               reserved.
+            </p>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <p>
+             Designed & Developed by <Link className="text-blue-600 underline cursor-pointer" href="https://www.nexolinx.com/">Nexo Linx Pvt Ltd</Link>
             </p>
           </div>
         </div>

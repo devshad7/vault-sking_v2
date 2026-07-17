@@ -19,11 +19,36 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/config/firebase.config";
 import { Product } from "@/data/products";
 import RecommendedProducts from "@/components/layout/Products/RecommendedProducts";
+import type { Metadata } from "next";
 
 interface Props {
   params: Promise<{
     slug: string;
   }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+
+  const q = query(
+    collection(db, "products"),
+    where("slug.current", "==", slug),
+  );
+
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) {
+    return { title: "Product | Vault Skin" };
+  }
+
+  const product = snapshot.docs[0].data() as Product;
+
+  return {
+    title: `${product.name} | Vault Skin`,
+    description:
+      product.description?.slice(0, 160) ||
+      `Shop ${product.name} at Vault Skin — authentic skincare in Nepal.`,
+  };
 }
 
 export default async function SingleProductPage({ params }: Props) {
@@ -98,9 +123,9 @@ export default async function SingleProductPage({ params }: Props) {
           <div className="space-y-2">
             {product?.badges && product.badges.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-2">
-                {product.badges.map((badge, index) => (
+                {product.badges.map((badge) => (
                   <span
-                    key={index}
+                    key={badge}
                     className="px-2 py-0.5 text-xs font-semibold bg-orange-100 text-orange-700 rounded-full"
                   >
                     {badge}
@@ -156,9 +181,9 @@ export default async function SingleProductPage({ params }: Props) {
                     Certifications
                   </h4>
                   <div className="flex flex-wrap gap-3">
-                    {product.certifications.map((cert, index) => (
+                    {product.certifications.map((cert) => (
                       <div
-                        key={index}
+                        key={cert}
                         className="flex items-center gap-1.5 text-sm text-gray-700"
                       >
                         <Check size={16} className="text-green-500" />
@@ -175,9 +200,9 @@ export default async function SingleProductPage({ params }: Props) {
                     Tags
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {product.tags.map((tag, index) => (
+                    {product.tags.map((tag) => (
                       <div
-                        key={index}
+                        key={tag}
                         className="flex items-center gap-1.5 text-xs text-gray-600 bg-gray-100 px-2.5 py-1 rounded-md"
                       >
                         <Tag size={12} />

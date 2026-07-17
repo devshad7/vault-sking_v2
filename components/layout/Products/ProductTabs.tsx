@@ -19,6 +19,7 @@ export default function ProductTabs({ tabs }: { tabs: Tab[] }) {
       <div className="flex overflow-x-auto border-b border-border hide-scrollbar">
         {tabs.map((tab) => (
           <button
+            type="button"
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={cn(

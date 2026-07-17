@@ -145,7 +145,7 @@ const WishListProducts = () => {
                       <PriceFormatter amount={product?.price} />
                     </td>
                     <td className="p-2">
-                      <AddToCartButton product={product} className="w-full" />
+                      <AddToCartButton product={product} iconOnly className="mx-auto" />
                     </td>
                   </tr>
                 ))}

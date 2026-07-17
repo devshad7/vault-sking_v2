@@ -12,8 +12,8 @@ export default function ProductFAQ({ faq }: { faq: { question: string; answer: s
   return (
     <div className="max-w-3xl py-4">
       <Accordion className="w-full">
-        {faq.map((item, index) => (
-          <AccordionItem key={index} value={`faq-${index}`}>
+        {faq.map((item) => (
+          <AccordionItem key={item.question} value={`faq-${item.question}`}>
             <AccordionTrigger className="text-lg font-medium text-gray-900 hover:text-primary">
               {item.question}
             </AccordionTrigger>

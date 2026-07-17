@@ -310,36 +310,13 @@ const categories: Category[] = [
 const brands: Brand[] = [
   {
     _id: "brand-1",
-    title: "CeraVe",
-    slug: { current: "cerave" },
+    title: "SkinInspired",
+    slug: { current: "skin-inspired" },
     description: "Dermatologist-developed skincare",
     image:
       "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
   },
-  {
-    _id: "brand-2",
-    title: "The Ordinary",
-    slug: { current: "the-ordinary" },
-    description: "Simple, effective formulas",
-    image:
-      "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    _id: "brand-3",
-    title: "La Roche-Posay",
-    slug: { current: "la-roche-posay" },
-    description: "Dermatological skincare",
-    image:
-      "https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    _id: "brand-4",
-    title: "Neutrogena",
-    slug: { current: "neutrogena" },
-    description: "Trusted everyday care",
-    image:
-      "https://images.unsplash.com/photo-1612817288484-6f916006741a?auto=format&fit=crop&w=800&q=80",
-  },
+ 
 ];
 
 const blogs: Blog[] = [

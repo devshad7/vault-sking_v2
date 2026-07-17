@@ -59,7 +59,7 @@ const Story = () => {
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
       {bulletPoints.map((point, index) => (
         <motion.div
-          key={index}
+          key={point}
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

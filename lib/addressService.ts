@@ -25,6 +25,7 @@ export interface Address {
 
   address: string;
   city: string;
+  province: string;
   district: string;
   zipCode: string;
 

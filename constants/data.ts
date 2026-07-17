@@ -3,6 +3,7 @@ export const navData = [
   { title: "Shop", href: "/shop" },
   { title: "Blog", href: "/blog" },
   { title: "Hot Deals", href: "/deal" },
+  { title: "Contact", href: "/contact" },
 ];
 export const quickLinksData = [
   { title: "About us", href: "/about" },

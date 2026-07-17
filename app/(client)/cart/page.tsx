@@ -157,6 +157,7 @@ const CartPage = () => {
 
                         <div className="flex items-center justify-between gap-2 flex-wrap mt-2 sm:mt-0">
                           <button
+                            type="button"
                             onClick={async () => {
                               try {
                                 await removeFromCart(product._id);

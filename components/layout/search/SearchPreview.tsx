@@ -76,7 +76,7 @@ export default function SearchPreview({ result, onView }: Props) {
       <p className="text-lg font-bold text-primary mb-4">{result.price}</p>
 
       {/* CTA */}
-      <button
+      <button type="button"
         onClick={handleView}
         className="inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
       >

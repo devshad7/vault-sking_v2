@@ -102,7 +102,7 @@ export default function SearchDrawer({
                   aria-label="Search input"
                 />
               </div>
-              <button
+              <button type="button"
                 aria-label="Close search"
                 className="shrink-0 p-2 text-gray-500 hover:text-gray-900 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 onClick={onClose}
@@ -127,7 +127,7 @@ export default function SearchDrawer({
                     "Hydrating Moisturizer",
                   ].map((term) => (
                     <li key={term}>
-                      <button
+                      <button type="button"
                         className="w-full text-left py-3 px-2 text-gray-800 hover:bg-gray-50 rounded-lg min-h-[44px]"
                         onClick={() => setQuery(term)}
                       >
@@ -167,7 +167,7 @@ export default function SearchDrawer({
                   </ul>
                   
                   {/* View all matching products link */}
-                  <button
+                  <button type="button"
                     onClick={() => onSubmit(query)}
                     className="w-full text-center py-3 mt-4 bg-primary text-white text-sm font-semibold rounded-xl shadow-sm hover:bg-primary/95 transition-colors"
                   >

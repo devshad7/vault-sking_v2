@@ -38,13 +38,13 @@ const OrdersButton = () => {
 
   return (
     <SignInButton
-      mode="modal"
+      mode="redirect"
       forceRedirectUrl="/order"
       signUpForceRedirectUrl="/order"
     >
       <button
         type="button"
-        className="relative group flex items-center"
+        className="relative group flex items-center cursor-pointer"
       >
         <Package className="w-5 h-5 text-text group-hover:text-accent transition-colors duration-300" />
 

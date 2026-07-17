@@ -10,15 +10,20 @@ import toast from "react-hot-toast";
 interface Props {
   product: Product;
   className?: string;
+  iconOnly?: boolean;
 }
 
-const AddToCartButton = ({ product, className }: Props) => {
+const AddToCartButton = ({
+  product,
+  className,
+  iconOnly = false,
+}: Props) => {
   const { addToCart } = useCart();
 
   const isOutOfStock = product?.stock === 0;
 
   return (
-    <div className="w-full h-10 flex items-center">
+    <div className={cn("h-10 flex items-center", iconOnly ? "" : "w-full")}>
       <Button
         disabled={isOutOfStock}
         onClick={() => {
@@ -29,12 +34,22 @@ const AddToCartButton = ({ product, className }: Props) => {
           });
         }}
         className={cn(
-          "w-full h-9 rounded-xl bg-primary text-white font-medium shadow-sm border border-primary transition-all duration-300 hover:bg-accent hover:border-accent hover:shadow-md hover:-translate-y-0.5 disabled:bg-border disabled:border-border disabled:text-text-muted disabled:cursor-not-allowed",
+          "h-9 rounded-xl bg-primary text-white font-medium shadow-sm border border-primary transition-all duration-300 hover:bg-accent hover:border-accent hover:shadow-md hover:-translate-y-0.5 disabled:bg-border disabled:border-border disabled:text-text-muted disabled:cursor-not-allowed",
+          iconOnly
+            ? "w-9 md:w-auto p-0 md:px-4 justify-center"
+            : "w-full px-4",
           className,
         )}
       >
-        <ShoppingBag className="w-4 h-4 mr-2" />
-        {isOutOfStock ? "Out of Stock" : "Add to Cart"}
+        <ShoppingBag className={cn("w-4 h-4", !iconOnly && "mr-2")} />
+
+        {iconOnly ? (
+          <span className="hidden md:inline">
+            {isOutOfStock ? "Out of Stock" : "Add to Cart"}
+          </span>
+        ) : (
+          <span>{isOutOfStock ? "Out of Stock" : "Add to Cart"}</span>
+        )}
       </Button>
     </div>
   );

@@ -79,8 +79,8 @@ export default function HomeBanner() {
       {/* ── Mobile carousel (< 1280px) ── */}
       <div className="block xl:hidden">
         <Swiper {...swiperConfig} className="w-full">
-          {mobileBanners.map((banner, index) => (
-            <SwiperSlide key={index}>
+          {mobileBanners.map((banner) => (
+            <SwiperSlide key={banner.src}>
               <div className="relative w-full h-[clamp(220px,55vw,480px)] overflow-hidden">
                 <Image
                   src={banner.src || ""}
@@ -100,8 +100,8 @@ export default function HomeBanner() {
       {/* ── Desktop carousel (≥ 1280px) — untouched ── */}
       <div className="hidden xl:block">
         <Swiper {...swiperConfig} className="w-full">
-          {desktopBanners.map((banner, index) => (
-            <SwiperSlide key={index}>
+          {desktopBanners.map((banner) => (
+            <SwiperSlide key={banner.src}>
               <div className="relative w-full h-[clamp(280px,50svh,680px)] overflow-hidden">
                 <Image
                   src={banner.src || ""}
