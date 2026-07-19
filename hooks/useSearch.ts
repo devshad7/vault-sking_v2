@@ -1,9 +1,10 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import debounce from "lodash.debounce";
 import { SearchResult, rankResults } from "@/types/search";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "@/config/firebase.config";
 import { Product } from "@/data/products";
+import { getSafeImageSrc } from "@/lib/image";
 
 export function useSearch(query: string) {
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -31,7 +32,7 @@ export function useSearch(query: string) {
     return unsubscribe;
   }, []);
 
-  const fetchResults = (searchTerm: string) => {
+  const fetchResults = useCallback((searchTerm: string) => {
     if (!searchTerm || searchTerm.trim().length === 0) {
       setResults([]);
       setLoading(false);
@@ -50,7 +51,7 @@ export function useSearch(query: string) {
         name: p.name,
         slug: p.slug.current,
         price: p.price.toString(),
-        imageUrl: p.images?.[0]?.src || "",
+        imageUrl: getSafeImageSrc(p.images?.[0]?.src || p.images?.[0]?.url || p.thumbnail),
         category: p.category,
         brand: p.brand,
         variant: p.variant || "",
@@ -69,10 +70,21 @@ export function useSearch(query: string) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [allProducts]);
 
-  const debouncedFetch = useMemo(() => debounce(fetchResults, 300), []);
+  const debouncedFetch = useMemo(
+    () =>
+      debounce((searchTerm: string) => {
+        fetchResults(searchTerm);
+      }, 300),
+    [fetchResults],
+  );
 
+  useEffect(() => {
+    return () => {
+      debouncedFetch.cancel();
+    };
+  }, [debouncedFetch]);
   const onArrowDown = () => {
     setHighlightedIndex((prev) => {
       const next = prev + 1;

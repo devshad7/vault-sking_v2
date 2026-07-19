@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { FocusTrap } from "focus-trap-react";
 import SearchResultCard from "./SearchResultCard";
 import SearchPreview from "./SearchPreview";
@@ -8,6 +8,7 @@ import { useSearch } from "@/hooks/useSearch";
 import { LucideX, Search } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { getRecentSearches, saveRecentSearches } from "@/lib/localStorage";
 
 type SearchModalProps = {
   query: string;
@@ -66,9 +67,9 @@ export default function SearchModal({
 
   const handleProductSelect = (slug: string, name: string) => {
     try {
-      const existing = JSON.parse(localStorage.getItem("recentSearches") || "[]");
+      const existing = getRecentSearches();
       const updated = [name, ...existing.filter((s: string) => s !== name)].slice(0, 8);
-      localStorage.setItem("recentSearches", JSON.stringify(updated));
+      saveRecentSearches(updated);
     } catch { }
     router.push(`/product/${slug}`);
     onClose();
@@ -95,7 +96,7 @@ export default function SearchModal({
   return (
     <AnimatePresence>
       {/* Backdrop */}
-      <motion.div
+      <m.div
         key="backdrop"
         className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
         initial={{ opacity: 0 }}
@@ -105,7 +106,7 @@ export default function SearchModal({
       />
 
       {/* Modal panel */}
-      <motion.div
+      <m.div
         key="modal"
         className="fixed inset-x-0 top-[72px] z-50 mx-auto w-[90vw] md:max-w-[900px] lg:w-[95vw] lg:max-w-[1100px] xl:max-w-[1200px] px-4"
         initial={{ opacity: 0, y: -12 }}
@@ -252,7 +253,7 @@ export default function SearchModal({
             </div>
           </div>
         </FocusTrap>
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 }

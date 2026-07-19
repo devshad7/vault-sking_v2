@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { SearchResult } from "@/types/search";
+import { getSafeImageSrc, PLACEHOLDER_IMAGE } from "@/lib/image";
 
 type Props = {
   result: SearchResult;
@@ -12,7 +13,7 @@ type Props = {
 
 export default function SearchResultCard({ result, onSelect, isHighlighted }: Props) {
   return (
-    <motion.button
+    <m.button
       onClick={onSelect}
       className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left transition-colors ${
         isHighlighted
@@ -25,14 +26,14 @@ export default function SearchResultCard({ result, onSelect, isHighlighted }: Pr
       {/* Product thumbnail */}
       <div className="flex-shrink-0 w-14 h-14 relative rounded-lg overflow-hidden bg-gray-100">
         <Image
-          src={result.imageUrl}
+          src={getSafeImageSrc(result.imageUrl)}
           alt={result.name}
           fill
           sizes="56px"
           style={{ objectFit: "cover" }}
           className="rounded-lg"
           onError={(e) => {
-            (e.target as HTMLImageElement).src = "/placeholder-product.png";
+            (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
           }}
         />
       </div>
@@ -69,6 +70,6 @@ export default function SearchResultCard({ result, onSelect, isHighlighted }: Pr
           )}
         </div>
       </div>
-    </motion.button>
+    </m.button>
   );
 }

@@ -75,7 +75,7 @@ const HomeCategories = () => {
             key={category?._id}
             className="bg-bg p-5 flex items-center gap-3 group"
           >
-            {category?.image && (
+            {category?.image && category.image.trim().length > 0 && (
               <div className="overflow-hidden border border-accent/30 hover:border-accent hoverEffect w-20 h-20 p-1">
                 <Link href={`/category/${category?.slug?.current}`}>
                   <Image

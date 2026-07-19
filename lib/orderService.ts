@@ -7,6 +7,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
   query,
   runTransaction,
   serverTimestamp,
@@ -439,5 +440,27 @@ export const placeOrder = async ({
       transaction.delete(cartRef);
     }
     return orderRef.id;
+  });
+};
+
+/**
+ * Subscribe to real-time order updates for a user.
+ * Returns an unsubscribe function — call it on cleanup.
+ */
+export const listenFirestoreOrders = (
+  userId: string,
+  callback: (orders: CustomerOrder[]) => void,
+) => {
+  const q = query(collection(db, "orders"), where("userId", "==", userId));
+
+  return onSnapshot(q, (snapshot) => {
+    const orders = snapshot.docs
+      .map((orderDoc) => toCustomerOrder(orderDoc.id, orderDoc.data()))
+      .sort(
+        (a, b) =>
+          (b.createdAt?.toMillis() ?? 0) - (a.createdAt?.toMillis() ?? 0),
+      );
+
+    callback(orders);
   });
 };

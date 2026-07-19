@@ -28,6 +28,7 @@ import { useCart } from "@/hooks/useCart";
 import { CartProduct, getCartProducts } from "@/utils/cartHelper";
 import { placeOrder, type PaymentMethod } from "@/lib/orderService";
 import Image from "next/image";
+import { getSafeImageSrc } from "@/lib/image";
 
 interface SavedAddressData {
   id: string;
@@ -600,7 +601,7 @@ export default function Checkout() {
                         <div>
                           <div className="w-10 h-10 bg-background rounded-lg flex items-center justify-center overflow-hidden">
                             <Image
-                              src={item.thumbnail}
+                              src={getSafeImageSrc(item.thumbnail)}
                               alt={item.name}
                               width={100}
                               height={100}

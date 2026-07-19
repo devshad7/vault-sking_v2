@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
+import { m } from "motion/react";
 import { Loader2 } from "lucide-react";
 
 const NoProductFound = ({
@@ -18,7 +18,7 @@ const NoProductFound = ({
         className
       )}
     >
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -26,9 +26,9 @@ const NoProductFound = ({
         <h2 className="text-2xl font-bold text-primary">
           No Product Available
         </h2>
-      </motion.div>
+      </m.div>
 
-      <motion.p
+      <m.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
@@ -39,25 +39,25 @@ const NoProductFound = ({
           {selectedTab}
         </span>{" "}
         criteria at the moment.
-      </motion.p>
+      </m.p>
 
-      <motion.div
+      <m.div
         animate={{ scale: [1, 1.1, 1] }}
         transition={{ repeat: Infinity, duration: 1.5 }}
         className="flex items-center space-x-2 text-primary text-lg"
       >
         <Loader2 className="w-5 h-5 animate-spin" />
         <span>We&apos;re restocking shortly</span>
-      </motion.div>
+      </m.div>
 
-      <motion.p
+      <m.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4, duration: 0.5 }}
         className="text-sm text-primary/60"
       >
         Please check back later or explore our other product categories.
-      </motion.p>
+      </m.p>
     </div>
   );
 };

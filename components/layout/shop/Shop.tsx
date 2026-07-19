@@ -1,6 +1,6 @@
 "use client";
 import { Brand, Category, Product } from "@/data/products";
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import Container from "../../Container";
 import Title from "../Products/Title";
 import CategoryList from "./CategoryList";
@@ -9,10 +9,17 @@ import BrandList from "./BrandList";
 import PriceList from "./PriceList";
 import SkinConcernList from "./SkinConcernList";
 import BenefitsList from "./BenefitsList";
-import { Loader2, SlidersHorizontal, ArrowUpDown, X } from "lucide-react";
+import {
+  Loader2,
+  SlidersHorizontal,
+  ArrowUpDown,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import NoProductFound from "../Products/NoProductFound";
 import ProductCard from "../Products/ProductCard";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "@/config/firebase.config";
 import {
@@ -25,6 +32,8 @@ interface Props {
   categories: Category[];
   brands: Brand[];
 }
+
+const ITEMS_PER_PAGE = 8;
 
 const Shop = ({ categories, brands }: Props) => {
   const searchParams = useSearchParams();
@@ -40,6 +49,11 @@ const Shop = ({ categories, brands }: Props) => {
     [],
   );
   const [firestoreBrands, setFirestoreBrands] = useState<Brand[]>([]);
+
+  // Anchor to scroll back to whenever the page changes, so "Next"
+  // brings the new results into view instead of leaving the user
+  // scrolled down at the pagination bar.
+  const gridTopRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -117,6 +131,9 @@ const Shop = ({ categories, brands }: Props) => {
   );
   const [selectedBenefits, setSelectedBenefits] = useState<string[]>([]);
   const [selectedSort, setSelectedSort] = useState<string>("default");
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Mobile Bottom Sheet Drawer States
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
@@ -201,6 +218,21 @@ const Shop = ({ categories, brands }: Props) => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedBrands(brandParams ? [brandParams] : []);
   }, [brandParams]);
+
+  // Any time a filter, sort, or search changes, the result set changes shape,
+  // so jump back to page 1 rather than stranding the user on a now-invalid page.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCurrentPage(1);
+  }, [
+    searchQuery,
+    selectedCategories,
+    selectedBrands,
+    selectedPrice,
+    selectedSkinConcerns,
+    selectedBenefits,
+    selectedSort,
+  ]);
 
   const displayCategories =
     firestoreCategories.length > 0 ? firestoreCategories : categories;
@@ -374,6 +406,27 @@ const Shop = ({ categories, brands }: Props) => {
     return items;
   }, [filteredProducts, selectedSort]);
 
+  // Pagination derived values
+  const totalPages = Math.max(
+    1,
+    Math.ceil(sortedProducts.length / ITEMS_PER_PAGE),
+  );
+
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return sortedProducts.slice(start, start + ITEMS_PER_PAGE);
+  }, [sortedProducts, currentPage]);
+
+  const rangeStart =
+    sortedProducts.length === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1;
+  const rangeEnd = Math.min(currentPage * ITEMS_PER_PAGE, sortedProducts.length);
+
+  const goToPage = (page: number) => {
+    const safePage = Math.min(Math.max(page, 1), totalPages);
+    setCurrentPage(safePage);
+    gridTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   const activeFiltersCount = useMemo(() => {
     return (
       selectedCategories.length +
@@ -396,9 +449,9 @@ const Shop = ({ categories, brands }: Props) => {
     <div className="border-t border-border/30 bg-bg min-h-screen">
       <Container className="mt-5 pb-16">
         {/* Desktop Title & Header */}
-        <div className="hidden md:flex items-center justify-between mb-6 pb-4 border-b border-border/20">
+        <div className="hidden md:flex items-center justify-between  pb-4 border-b border-border/20">
           <div className="flex flex-col gap-1">
-            <Title className="text-xl font-bold tracking-tight text-text">
+            <Title className="text-xl font-bold tracking-tight text-accent">
               {searchQuery
                 ? `Search Results for "${searchQuery}"`
                 : "Shop Products"}
@@ -545,7 +598,7 @@ const Shop = ({ categories, brands }: Props) => {
           </div>
           {/* Product Grid Area */}
           <div className="min-w-0 flex-1">
-            {" "}
+            <div ref={gridTopRef} />
             {loading ? (
               <div className="p-20 flex flex-col gap-3 items-center justify-center bg-white rounded-2xl border border-border/35 shadow-sm">
                 <Loader2 className="w-10 h-10 text-primary animate-spin" />
@@ -554,16 +607,69 @@ const Shop = ({ categories, brands }: Props) => {
                 </p>
               </div>
             ) : sortedProducts?.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
-                {sortedProducts?.map((product) => (
-                  <div
-                    key={product?._id}
-                    className="h-full flex flex-col justify-between"
-                  >
-                    <ProductCard product={product} />
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
+                  {paginatedProducts?.map((product) => (
+                    <div
+                      key={product?._id}
+                      className="h-full flex flex-col justify-between"
+                    >
+                      <ProductCard product={product} />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-6 border-t border-border/30">
+                    <p className="text-sm text-text-muted order-2 sm:order-1">
+                      Showing {rangeStart} to {rangeEnd} of{" "}
+                      {sortedProducts.length} results
+                    </p>
+                    <div className="flex items-center gap-2 order-1 sm:order-2">
+                      <button
+                        type="button"
+                        onClick={() => goToPage(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        aria-label="Previous page"
+                        className="w-9 h-9 flex items-center justify-center rounded-lg border border-border/40 text-text-muted hover:text-text hover:border-border disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-text-muted disabled:hover:border-border/40 transition-colors cursor-pointer"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+
+                      {Array.from({ length: totalPages }).map((_, i) => {
+                        const page = i + 1;
+                        const isActive = page === currentPage;
+                        return (
+                          <button
+                            key={page}
+                            type="button"
+                            onClick={() => goToPage(page)}
+                            aria-current={isActive ? "page" : undefined}
+                            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
+                              isActive
+                                ? "bg-primary text-white"
+                                : "border border-border/40 text-text-muted hover:text-text hover:border-border"
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        );
+                      })}
+
+                      <button
+                        type="button"
+                        onClick={() => goToPage(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        aria-label="Next page"
+                        className="w-9 h-9 flex items-center justify-center rounded-lg border border-border/40 text-text-muted hover:text-text hover:border-border disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-text-muted disabled:hover:border-border/40 transition-colors cursor-pointer"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-                ))}
-              </div>
+                )}
+              </>
             ) : (
               <NoProductFound className="bg-white rounded-2xl border border-border/35 p-12 mt-0" />
             )}
@@ -576,7 +682,7 @@ const Shop = ({ categories, brands }: Props) => {
         {isMobileDrawerOpen && (
           <>
             {/* Backdrop blur overlay */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -585,7 +691,7 @@ const Shop = ({ categories, brands }: Props) => {
             />
 
             {/* Bottom Sheet Container */}
-            <motion.div
+            <m.div
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
@@ -632,10 +738,10 @@ const Shop = ({ categories, brands }: Props) => {
                   </button>
                   <AnimatePresence initial={false}>
                     {openSections.categories && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
+                      <m.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         transition={{ duration: 0.2, ease: "easeInOut" }}
                         className="overflow-hidden"
                       >
@@ -646,7 +752,7 @@ const Shop = ({ categories, brands }: Props) => {
                             setSelectedCategories={setDraftCategories}
                           />
                         </div>
-                      </motion.div>
+                      </m.div>
                     )}
                   </AnimatePresence>
                 </div>
@@ -674,10 +780,10 @@ const Shop = ({ categories, brands }: Props) => {
                   </button>
                   <AnimatePresence initial={false}>
                     {openSections.brands && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
+                      <m.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         transition={{ duration: 0.2, ease: "easeInOut" }}
                         className="overflow-hidden"
                       >
@@ -688,7 +794,7 @@ const Shop = ({ categories, brands }: Props) => {
                             setSelectedBrands={setDraftBrands}
                           />
                         </div>
-                      </motion.div>
+                      </m.div>
                     )}
                   </AnimatePresence>
                 </div>
@@ -713,10 +819,10 @@ const Shop = ({ categories, brands }: Props) => {
                   </button>
                   <AnimatePresence initial={false}>
                     {openSections.price && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
+                      <m.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         transition={{ duration: 0.2, ease: "easeInOut" }}
                         className="overflow-hidden"
                       >
@@ -726,7 +832,7 @@ const Shop = ({ categories, brands }: Props) => {
                             setSelectedPrice={setDraftPrice}
                           />
                         </div>
-                      </motion.div>
+                      </m.div>
                     )}
                   </AnimatePresence>
                 </div>
@@ -755,10 +861,10 @@ const Shop = ({ categories, brands }: Props) => {
                   </button>
                   <AnimatePresence initial={false}>
                     {openSections.concern && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
+                      <m.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         transition={{ duration: 0.2, ease: "easeInOut" }}
                         className="overflow-hidden"
                       >
@@ -768,7 +874,7 @@ const Shop = ({ categories, brands }: Props) => {
                             setSelectedSkinConcerns={setDraftSkinConcerns}
                           />
                         </div>
-                      </motion.div>
+                      </m.div>
                     )}
                   </AnimatePresence>
                 </div>
@@ -796,10 +902,10 @@ const Shop = ({ categories, brands }: Props) => {
                   </button>
                   <AnimatePresence initial={false}>
                     {openSections.benefits && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
+                      <m.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         transition={{ duration: 0.2, ease: "easeInOut" }}
                         className="overflow-hidden"
                       >
@@ -809,7 +915,7 @@ const Shop = ({ categories, brands }: Props) => {
                             setSelectedBenefits={setDraftBenefits}
                           />
                         </div>
-                      </motion.div>
+                      </m.div>
                     )}
                   </AnimatePresence>
                 </div>
@@ -830,7 +936,7 @@ const Shop = ({ categories, brands }: Props) => {
                   Apply Filters
                 </button>
               </div>
-            </motion.div>
+            </m.div>
           </>
         )}
       </AnimatePresence>

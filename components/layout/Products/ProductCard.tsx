@@ -1,5 +1,6 @@
 import type { Product } from "@/data/products";
 import Image from "next/image";
+import { getSafeImageSrc } from "@/lib/image";
 import React from "react";
 import Link from "next/link";
 import PriceView from "./PriceView";
@@ -16,45 +17,52 @@ const statusConfig = {
 const ProductCard = ({
   product,
   layout = "default",
+  index = 0,
 }: {
   product: Product;
   layout?: "default" | "compact";
+  index?: number;
 }) => {
   const isCompact = layout === "compact";
+  // Only the first row (roughly) should be eagerly loaded/preloaded.
+  // Everything below the fold should lazy-load instead.
+  const isAboveFold = index < 4;
   return (
     <div
-      className={`text-sm group flex flex-col ${isCompact ? "gap-2.5 w-full" : "gap-3"}`}
+      className={`text-sm group flex flex-col`}
     >
-      <div className="relative overflow-hidden bg-bg/90 rounded-md aspect-4/5">
+       <div className="relative overflow-hidden bg-bg/90 rounded-md aspect-[4/5.4]">
         {product?.images && (
           <Link
             href={`/product/${product?.slug?.current}`}
             className=" relative w-full h-full block"
           >
             <Image
-              src={product.images[0]?.url || product.thumbnail || ""}
+              src={getSafeImageSrc(product.images[0]?.url || product.thumbnail)}
               alt={product?.name || "Product Image"}
               fill
-              priority
+              priority={isAboveFold}
+              loading={isAboveFold ? undefined : "lazy"}
               sizes={
                 isCompact
                   ? "(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
                   : "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
               }
-              className={`object-cover transition-transform duration-300 ease-out 
-              ${product?.stock !== 0 ? "group-hover:scale-[1.02]" : "opacity-60"}`}
+              className={`object-contain scale-105 transition-transform duration-300 ease-out ${product?.stock !== 0
+                  ? "group-hover:scale-110"
+                  : "opacity-60 scale-105"
+                }`}
             />
           </Link>
         )}
-        <div className="absolute top-2 right-2 z-10">
-          <AddToWishlistButton product={product} />
-        </div>
+        <div className="absolute top-7 md:top-9 lg:top-11 right-2 z-10 flex items-center justify-center w-8 h-8 rounded-full bg-white/95 shadow-md ring-1 ring-black/5 backdrop-blur-sm opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 ease-out">
+  <AddToWishlistButton product={product} />
+</div>
         {product?.status &&
           statusConfig[product.status as keyof typeof statusConfig] && (
             <span
-              className={`absolute top-2 left-2 z-10 px-2 py-0.5 text-xs font-medium rounded shadow-sm ${
-                statusConfig[product.status as keyof typeof statusConfig]
-              }`}
+              className={`absolute top-7 md:top-9 lg:top-11.5 left-2 z-10 px-2.5 py-1 text-[11px] font-semibold leading-none rounded-br-lg shadow-sm ${statusConfig[product.status as keyof typeof statusConfig]
+                }`}
             >
               {product.status.charAt(0).toUpperCase() + product.status.slice(1)}
             </span>

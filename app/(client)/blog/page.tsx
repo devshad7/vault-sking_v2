@@ -14,8 +14,8 @@ export const metadata: Metadata = {
     "Skincare tips, product guides, and beauty insights from Vault Skin — your trusted skincare destination in Nepal.",
 };
 
-const BlogPage = () => {
-  const blogs = getAllBlogs();
+const BlogPage = async () => {
+  const blogs = await getAllBlogs();
 
   return (
     <div>
@@ -28,7 +28,7 @@ const BlogPage = () => {
               key={blog?._id}
               className="group w-full max-w-xs rounded-md overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
             >
-              {blog?.mainImage && (
+              {blog?.mainImage && blog.mainImage.trim().length > 0 && (
                 <div className="overflow-hidden">
                   <Image
                     src={blog?.mainImage}

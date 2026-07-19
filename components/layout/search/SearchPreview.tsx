@@ -1,10 +1,12 @@
+
 "use client";
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { ArrowRight, Tag } from "lucide-react";
 import { SearchResult } from "@/types/search";
+import { getSafeImageSrc, PLACEHOLDER_IMAGE } from "@/lib/image";
 
 type Props = {
   result: SearchResult;
@@ -22,7 +24,7 @@ export default function SearchPreview({ result, onView }: Props) {
   };
 
   return (
-    <motion.div
+    <m.div
       key={result.id}
       className="h-full flex flex-col items-center justify-center p-6 text-center"
       initial={{ opacity: 0, x: 8 }}
@@ -32,14 +34,14 @@ export default function SearchPreview({ result, onView }: Props) {
       {/* Image */}
       <div className="relative w-48 h-48 mb-4 rounded-2xl overflow-hidden bg-gray-100 shadow-sm">
         <Image
-          src={result.imageUrl}
+          src={getSafeImageSrc(result.imageUrl)}
           alt={result.name}
           fill
           sizes="192px"
           style={{ objectFit: "cover" }}
           className="rounded-2xl"
           onError={(e) => {
-            (e.target as HTMLImageElement).src = "/placeholder-product.png";
+            (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
           }}
         />
         {result.status && (
@@ -78,10 +80,10 @@ export default function SearchPreview({ result, onView }: Props) {
       {/* CTA */}
       <button type="button"
         onClick={handleView}
-        className="inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
+        className="inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/95 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
       >
         View Product <ArrowRight size={14} />
       </button>
-    </motion.div>
+    </m.div>
   );
 }

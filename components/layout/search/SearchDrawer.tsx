@@ -1,10 +1,11 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { FocusTrap } from "focus-trap-react";
 import SearchResultCard from "./SearchResultCard";
 import { useSearch } from "@/hooks/useSearch";
 import { LucideX } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { getRecentSearches, saveRecentSearches } from "@/lib/localStorage";
 
 type SearchDrawerProps = {
   query: string;
@@ -51,9 +52,9 @@ export default function SearchDrawer({
 
   const handleProductSelect = (slug: string, name: string) => {
     try {
-      const existing = JSON.parse(localStorage.getItem("recentSearches") || "[]");
+      const existing = getRecentSearches();
       const updated = [name, ...existing.filter((s: string) => s !== name)].slice(0, 8);
-      localStorage.setItem("recentSearches", JSON.stringify(updated));
+      saveRecentSearches(updated);
     } catch {}
     router.push(`/product/${slug}`);
     onClose();
@@ -75,7 +76,7 @@ export default function SearchDrawer({
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         className="fixed inset-0 z-50 flex flex-col bg-white overflow-hidden"
         initial="hidden"
         animate="visible"
@@ -179,7 +180,7 @@ export default function SearchDrawer({
           </div>
           </div>
         </FocusTrap>
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 }

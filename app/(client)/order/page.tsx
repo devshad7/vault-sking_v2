@@ -28,13 +28,15 @@ const statusClassName: Record<CustomerOrderStatus, string> = {
 const formatStatus = (status: CustomerOrderStatus) =>
   `${status.charAt(0).toUpperCase()}${status.slice(1)}`;
 
+const orderDateFormatter = new Intl.DateTimeFormat("en-NP", {
+  dateStyle: "medium",
+  timeStyle: "short",
+});
+
 const formatOrderDate = (order: CustomerOrder) => {
   if (!order.createdAt) return "Date unavailable";
 
-  return new Intl.DateTimeFormat("en-NP", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(order.createdAt.toDate());
+  return orderDateFormatter.format(order.createdAt.toDate());
 };
 
 const OrdersPage = () => {

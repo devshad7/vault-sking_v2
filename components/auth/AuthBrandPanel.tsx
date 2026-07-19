@@ -1,6 +1,5 @@
 import React from "react";
-import Image from "next/image";
-import { ShieldCheck, Lock, Truck, BadgeCheck } from "lucide-react";
+import { ShieldCheck, Lock, Truck } from "lucide-react";
 
 const FEATURES = [
   {

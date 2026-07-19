@@ -1,3 +1,4 @@
+
 import Container from "@/components/Container";
 import Title from "@/components/layout/Products/Title";
 import {
@@ -19,7 +20,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const blog = getSingleBlog(slug);
+  const blog = await getSingleBlog(slug);
 
   if (!blog) {
     return { title: "Blog | Vault Skin" };
@@ -28,7 +29,7 @@ export async function generateMetadata({
   return {
     title: `${blog.title} | Vault Skin`,
     description:
-      blog.body?.slice(0, 160) ||
+      blog.body?.replace(/<[^>]*>/g, "").slice(0, 160) ||
       `Read ${blog.title} on the Vault Skin blog.`,
   };
 }
@@ -39,14 +40,14 @@ const SingleBlogPage = async ({
   params: Promise<{ slug: string }>;
 }) => {
   const { slug } = await params;
-  const blog = getSingleBlog(slug);
+  const blog = await getSingleBlog(slug);
   if (!blog) return notFound();
 
   return (
     <div className="py-10">
       <Container className="grid grid-cols-1 lg:grid-cols-4 gap-5">
         <div className="md:col-span-3">
-          {blog?.mainImage && (
+          {blog?.mainImage && blog.mainImage.trim().length > 0 && (
             <Image
               src={blog?.mainImage}
               alt={blog.title || "Blog Image"}
@@ -83,7 +84,12 @@ const SingleBlogPage = async ({
               <div className="text-black">
                 <div>
                   {blog.body && (
-                    <p className="text-base leading-8">{blog.body}</p>
+                    <div
+                      className="prose prose-slate max-w-none text-base leading-8"
+                      // Safe: `blog.body` is sanitized with DOMPurify before
+                      // being saved from the admin blog editor.
+                      dangerouslySetInnerHTML={{ __html: blog.body }}
+                    />
                   )}
                   <div className="mt-10">
                     <Link href="/blog" className="flex items-center gap-1">
@@ -105,8 +111,8 @@ const SingleBlogPage = async ({
 };
 
 const BlogLeft = async ({ slug }: { slug: string }) => {
-  const categories = getBlogCategories();
-  const blogs = getOthersBlog(slug, 5);
+  const categories = await getBlogCategories();
+  const blogs = await getOthersBlog(slug, 5);
 
   return (
     <div>
@@ -133,7 +139,7 @@ const BlogLeft = async ({ slug }: { slug: string }) => {
               key={blog._id}
               className="flex items-center gap-2 group"
             >
-              {blog?.mainImage && (
+              {blog?.mainImage && blog.mainImage.trim().length > 0 && (
                 <Image
                   src={blog?.mainImage}
                   alt="blogImage"

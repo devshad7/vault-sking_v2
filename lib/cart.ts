@@ -2,18 +2,32 @@
 
 import { Product } from "@/lib/frontend-data";
 
+import { GUEST_CART_KEY } from "./localStorage";
+
 export interface CartItem {
   productId: string;
   quantity: number;
 }
 
-const CART_KEY = "guest_cart";
+const CART_KEY = GUEST_CART_KEY;
 
 /**
  * Get guest cart
  */
 export const getGuestCart = (): CartItem[] => {
   if (typeof window === "undefined") return [];
+
+  // Migration path
+  const legacy = localStorage.getItem("guest_cart");
+  if (legacy) {
+    try {
+      localStorage.setItem(CART_KEY, legacy);
+      localStorage.removeItem("guest_cart");
+      return JSON.parse(legacy);
+    } catch {
+      localStorage.removeItem("guest_cart");
+    }
+  }
 
   const cart = localStorage.getItem(CART_KEY);
 
@@ -103,6 +117,7 @@ export const decreaseGuestQuantity = (productId: string) => {
  */
 export const clearGuestCart = () => {
   localStorage.removeItem(CART_KEY);
+  localStorage.removeItem("guest_cart");
 };
 
 /**

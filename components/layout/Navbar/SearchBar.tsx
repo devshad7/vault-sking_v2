@@ -5,6 +5,7 @@ import { useId, useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useMediaQuery } from "usehooks-ts";
 import { useRouter } from "next/navigation";
+import { getRecentSearches, saveRecentSearches } from "@/lib/localStorage";
 
 // Lazy load modal/drawer to avoid SSR issues
 const SearchModal = dynamic(() => import("@/components/layout/search/SearchModal"), { ssr: false });
@@ -41,9 +42,9 @@ const SearchBar = ({
   const handleSubmit = (q: string) => {
     // Store recent search
     try {
-      const existing = JSON.parse(localStorage.getItem("recentSearches") || "[]");
+      const existing = getRecentSearches();
       const updated = [q, ...existing.filter((s: string) => s !== q)].slice(0, 8);
-      localStorage.setItem("recentSearches", JSON.stringify(updated));
+      saveRecentSearches(updated);
     } catch { }
 
     if (onSubmit) {

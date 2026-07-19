@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { CartProduct, getCartProducts } from "@/utils/cartHelper";
 import { ShoppingCart, Trash } from "lucide-react";
 import Image from "next/image";
+import { getSafeImageSrc } from "@/lib/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -108,7 +109,7 @@ const CartPage = () => {
                           className="self-start shrink-0 w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 border rounded-xl overflow-hidden group"
                         >
                           <Image
-                            src={product.thumbnail}
+                            src={getSafeImageSrc(product.thumbnail)}
                             alt={product?.name ?? "product image"}
                             width={112}
                             height={112}

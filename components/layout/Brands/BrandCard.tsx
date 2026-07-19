@@ -7,7 +7,7 @@ interface BrandCardProps {
 }
 
 const BrandCard = ({ brand }: BrandCardProps) => {
-  if (!brand?.image) return null;
+  if (!brand?.image || brand.image.trim().length === 0) return null;
 
   return (
     <Link

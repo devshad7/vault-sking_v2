@@ -1,5 +1,6 @@
 "use client";
 
+import { LazyMotion, domAnimation, MotionConfig } from "framer-motion";
 import { ImageKitProvider } from "@imagekit/next";
 
 export default function Providers({
@@ -8,10 +9,14 @@ export default function Providers({
   children: React.ReactNode;
 }) {
   return (
-    <ImageKitProvider
-      urlEndpoint={process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT!}
-    >
-      {children}
-    </ImageKitProvider>
+    <LazyMotion features={domAnimation}>
+      <MotionConfig reducedMotion="user">
+        <ImageKitProvider
+          urlEndpoint={process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT!}
+        >
+          {children}
+        </ImageKitProvider>
+      </MotionConfig>
+    </LazyMotion>
   );
-}
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import Container from "@/components/Container";
 import { BadgeCheck } from "lucide-react";
 import Image from "next/image";
@@ -9,7 +9,7 @@ import Image from "next/image";
 const PartnerBrand = () => {
   return (
     <Container className="w-full">
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 15 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -23,6 +23,7 @@ const PartnerBrand = () => {
               src="/Images/brand.avif"
               alt="SkinInspired Brand Logo"
               fill
+              sizes="(min-width: 768px) 384px, calc(100vw - 64px)"
               className="object-contain p-4"
             />
           </div>
@@ -57,7 +58,7 @@ const PartnerBrand = () => {
             customer satisfaction with every purchase.
           </p>
         </div>
-      </motion.div>
+      </m.div>
     </Container>
   );
 };

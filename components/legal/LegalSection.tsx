@@ -2,7 +2,7 @@
 
 import React from "react";
 import { LucideIcon } from "lucide-react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 interface LegalSectionProps {
   icon: LucideIcon;
@@ -13,7 +13,7 @@ interface LegalSectionProps {
 
 export function LegalSection({ icon: Icon, title, children, delay = 0 }: LegalSectionProps) {
   return (
-    <motion.section 
+    <m.section
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
@@ -29,6 +29,6 @@ export function LegalSection({ icon: Icon, title, children, delay = 0 }: LegalSe
       <div className="text-[15.5px] leading-[1.8] text-text-muted space-y-4">
         {children}
       </div>
-    </motion.section>
+    </m.section>
   );
 }

@@ -1,3 +1,4 @@
+
 import React from "react";
 import Title from "@/components/layout/Products/Title";
 import { getLatestBlogs } from "@/lib/frontend-data";
@@ -6,8 +7,8 @@ import Link from "next/link";
 import { Calendar } from "lucide-react";
 import dayjs from "dayjs";
 
-const LatestBlog = () => {
-  const blogs = getLatestBlogs();
+const LatestBlog = async () => {
+  const blogs = await getLatestBlogs();
   return (
     <section className="max-w-7xl mx-auto">
       <div className="mb-6 flex items-center justify-between border-b border-grey/60 pb-3">
@@ -27,7 +28,7 @@ const LatestBlog = () => {
 
           return (
             <div key={blog._id} className="rounded-lg overflow-hidden">
-              {blog.mainImage && (
+              {blog.mainImage && blog.mainImage.trim().length > 0 && (
                 <Link href={`/blog/${blog.slug.current}`}>
                   <Image
                     src={blog.mainImage}

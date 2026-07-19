@@ -41,13 +41,15 @@ const statusClassName: Record<CustomerOrderStatus, string> = {
 const formatStatus = (status: CustomerOrderStatus) =>
   `${status.charAt(0).toUpperCase()}${status.slice(1)}`;
 
+const orderDateFormatter = new Intl.DateTimeFormat("en-NP", {
+  dateStyle: "medium",
+  timeStyle: "short",
+});
+
 const formatDate = (value: CustomerOrder["createdAt"]) => {
   if (!value) return "Date unavailable";
 
-  return new Intl.DateTimeFormat("en-NP", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(value.toDate());
+  return orderDateFormatter.format(value.toDate());
 };
 
 const cancellationMessage = (status: CustomerOrderStatus) => {
@@ -232,7 +234,7 @@ const OrderDetailPage = () => {
                   className="flex gap-4 border-b border-border pb-4 last:border-0 last:pb-0"
                 >
                   <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-surface">
-                    {item.thumbnail ? (
+                    {item.thumbnail && item.thumbnail.trim().length > 0 ? (
                       // The thumbnail comes from the immutable order record, so it remains accurate after a product changes.
                       <Image
                         src={item.thumbnail}

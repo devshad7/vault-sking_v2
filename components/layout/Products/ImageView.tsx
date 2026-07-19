@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, m } from "motion/react";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -17,6 +17,7 @@ const ImageView = ({ images = [], isStock }: Props) => {
     (image): image is { src: string; alt: string } =>
       typeof image?.src === "string" && image.src.trim().length > 0,
   );
+
   const [active, setActive] = useState(validImages[0]);
 
   if (!active) return null;
@@ -36,9 +37,9 @@ const ImageView = ({ images = [], isStock }: Props) => {
           shadow-sm
         "
       >
-        <AnimatePresence>
-          <motion.div
-            key={active?.src}
+        <AnimatePresence mode="wait">
+          <m.div
+            key={active.src}
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
@@ -53,6 +54,7 @@ const ImageView = ({ images = [], isStock }: Props) => {
               alt={active.alt}
               fill
               priority
+              fetchPriority="high"
               sizes="(max-width: 1024px) 100vw, 50vw"
               className={`
                 object-contain
@@ -64,12 +66,12 @@ const ImageView = ({ images = [], isStock }: Props) => {
                 ${isStock === 0 ? "opacity-50" : ""}
               `}
             />
-          </motion.div>
+          </m.div>
         </AnimatePresence>
       </div>
 
       <div className="flex flex-wrap gap-3">
-        {validImages.map((image) => (
+        {validImages.map((image, index) => (
           <button
             key={image.src}
             type="button"
@@ -95,6 +97,9 @@ const ImageView = ({ images = [], isStock }: Props) => {
               alt={image.alt}
               width={100}
               height={100}
+              priority={index === 0}
+              fetchPriority={index === 0 ? "high" : "auto"}
+              loading={index === 0 ? undefined : "lazy"}
               className="w-full h-full object-contain"
             />
           </button>

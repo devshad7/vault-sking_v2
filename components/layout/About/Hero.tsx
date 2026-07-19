@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import Container from "@/components/Container";
@@ -14,13 +14,14 @@ const Hero = () => {
         alt="Banner"
         fill
         priority
+        sizes="100vw"
         className="object-cover opacity-45 filter"
       />
       {/* Overlay for readability */}
       <div className="absolute inset-0 bg-white/60 pointer-events-none" />
 
       <Container className="relative z-10 flex flex-col items-center justify-center text-center px-4">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -40,7 +41,7 @@ const Hero = () => {
           <p className="max-w-2xl text-base md:text-lg text-text-muted mx-auto leading-relaxed">
             Your trusted destination for authentic skincare products from carefully selected brands.
           </p>
-        </motion.div>
+        </m.div>
       </Container>
     </section>
   );

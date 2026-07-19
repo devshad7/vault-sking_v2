@@ -8,6 +8,7 @@ import Link from "next/link";
 import type { Product } from "@/data/products";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import { getSafeImageSrc } from "@/lib/image";
 import PriceFormatter from "./PriceFormatter";
 import AddToCartButton from "./AddToCartButton";
 import { useWishlist } from "@/hooks/useWishlist";
@@ -106,11 +107,7 @@ const WishListProducts = () => {
                           className="border rounded-md group hidden md:inline-flex"
                         >
                           <Image
-                            src={
-                              product?.images[0]?.url ||
-                              product?.thumbnail ||
-                              ""
-                            }
+                            src={getSafeImageSrc(product?.images[0]?.url || product?.thumbnail)}
                             alt={"product image"}
                             width={80}
                             height={80}

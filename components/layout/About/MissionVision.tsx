@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Target, Eye } from "lucide-react";
 import Container from "@/components/Container";
 
@@ -8,7 +8,7 @@ const MissionVision = () => {
   return (
     <Container className="w-full">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -22,9 +22,9 @@ const MissionVision = () => {
           <p className="text-base text-text-muted leading-relaxed">
            To make authentic skincare accessible, affordable, and trustworthy for everyone.
           </p>
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -38,7 +38,7 @@ const MissionVision = () => {
           <p className="text-base text-text-muted leading-relaxed">
             To become Nepal&apos;s most trusted online destination for premium skincare.
           </p>
-        </motion.div>
+        </m.div>
       </div>
 
     </Container>

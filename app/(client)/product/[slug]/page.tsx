@@ -27,6 +27,23 @@ interface Props {
   }>;
 }
 
+const getImageSrc = (image: unknown) => {
+  if (!image || typeof image !== "object") return "";
+
+  const imageObj = image as {
+    src?: unknown;
+    url?: unknown;
+    asset?: { url?: unknown };
+  };
+
+  const candidates = [imageObj.src, imageObj.url, imageObj.asset?.url];
+  const firstValid = candidates.find(
+    (value) => typeof value === "string" && value.trim().length > 0,
+  );
+
+  return typeof firstValid === "string" ? firstValid.trim() : "";
+};
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
 
@@ -72,33 +89,19 @@ export default async function SingleProductPage({ params }: Props) {
     _id: doc.id,
   };
 
-  const getImageSrc = (image: unknown) => {
-    if (!image || typeof image !== "object") return "";
 
-    const imageObj = image as {
-      src?: unknown;
-      url?: unknown;
-      asset?: { url?: unknown };
-    };
-
-    const candidates = [imageObj.src, imageObj.url, imageObj.asset?.url];
-    const firstValid = candidates.find(
-      (value) => typeof value === "string" && value.trim().length > 0,
-    );
-
-    return typeof firstValid === "string" ? firstValid.trim() : "";
-  };
-
-  const productImages = (product.images ?? [])
-    .map((image) => ({
-      src: getImageSrc(image),
-      alt: image?.alt?.trim() || product?.name || "Product image",
-    }))
-    .filter((image) => image.src.length > 0)
-    .map((image) => ({
-      src: image.src,
-      alt: image.alt,
-    }));
+  const productImages = (product.images ?? []).reduce<
+    { src: string; alt: string }[]
+  >((acc, image) => {
+    const src = getImageSrc(image);
+    if (src.length > 0) {
+      acc.push({
+        src,
+        alt: image?.alt?.trim() || product?.name || "Product image",
+      });
+    }
+    return acc;
+  }, []);
 
   const normalizedImages =
     productImages.length > 0

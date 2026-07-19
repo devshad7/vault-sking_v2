@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import Image from "next/image";
 import Container from "@/components/Container";
 import { CheckCircle2 } from "lucide-react";
@@ -19,7 +19,7 @@ const Story = () => {
     <Container className="w-full">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-stretch">
   {/* Image */}
-  <motion.div
+  <m.div
     initial={{ opacity: 0, y: 15 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
@@ -33,10 +33,10 @@ const Story = () => {
       height={400}
       className="object-contain"
     />
-  </motion.div>
+  </m.div>
 
   {/* Content */}
-  <motion.div
+  <m.div
     initial={{ opacity: 0, y: 15 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
@@ -58,7 +58,7 @@ const Story = () => {
 
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
       {bulletPoints.map((point, index) => (
-        <motion.div
+        <m.div
           key={point}
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -70,10 +70,10 @@ const Story = () => {
           <span className="text-sm font-medium text-accent">
             {point}
           </span>
-        </motion.div>
+        </m.div>
       ))}
     </div>
-  </motion.div>
+  </m.div>
 </div>
     </Container>
   );

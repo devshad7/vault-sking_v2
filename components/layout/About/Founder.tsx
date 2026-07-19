@@ -15,6 +15,7 @@ const Founder = () => {
               alt="Drishti Bhattrai"
               fill
               priority
+              sizes="(min-width: 1024px) 480px, (min-width: 768px) 384px, 336px"
               className="object-contain"
             />
           </div>

@@ -1,19 +1,46 @@
 "use client";
 
-const WISHLIST_KEY = "guest_wishlist";
+import { GUEST_WISHLIST_KEY } from "./localStorage";
+
+const WISHLIST_KEY = GUEST_WISHLIST_KEY;
 const LEGACY_WISHLIST_KEY = "vault-skin-wishlist";
+
+const rawReadWishlistIds = (): string[] => {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(WISHLIST_KEY);
+    return raw ? (JSON.parse(raw) as string[]) : [];
+  } catch {
+    return [];
+  }
+};
 
 const migrateLegacyWishlist = () => {
   if (typeof window === "undefined") return;
 
+  // Migrate from unversioned "guest_wishlist"
+  const oldWishlist = localStorage.getItem("guest_wishlist");
+  if (oldWishlist) {
+    try {
+      const oldIds = JSON.parse(oldWishlist) as string[];
+      const current = rawReadWishlistIds();
+      const merged = [...new Set([...current, ...oldIds])];
+      localStorage.setItem(WISHLIST_KEY, JSON.stringify(merged));
+      localStorage.removeItem("guest_wishlist");
+    } catch {
+      localStorage.removeItem("guest_wishlist");
+    }
+  }
+
+  // Migrate from older legacy key
   const legacy = localStorage.getItem(LEGACY_WISHLIST_KEY);
   if (!legacy) return;
 
   try {
     const legacyIds = JSON.parse(legacy) as string[];
-    const current = readWishlistIds();
+    const current = rawReadWishlistIds();
     const merged = [...new Set([...current, ...legacyIds])];
-    saveGuestWishlist(merged);
+    localStorage.setItem(WISHLIST_KEY, JSON.stringify(merged));
     localStorage.removeItem(LEGACY_WISHLIST_KEY);
   } catch {
     localStorage.removeItem(LEGACY_WISHLIST_KEY);
@@ -25,12 +52,7 @@ const readWishlistIds = (): string[] => {
 
   migrateLegacyWishlist();
 
-  try {
-    const raw = localStorage.getItem(WISHLIST_KEY);
-    return raw ? (JSON.parse(raw) as string[]) : [];
-  } catch {
-    return [];
-  }
+  return rawReadWishlistIds();
 };
 
 /**
@@ -89,6 +111,7 @@ export const toggleGuestWishlistItem = (productId: string): string[] => {
  */
 export const clearGuestWishlist = () => {
   localStorage.removeItem(WISHLIST_KEY);
+  localStorage.removeItem("guest_wishlist");
 };
 
 /**

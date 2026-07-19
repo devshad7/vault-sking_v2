@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, m } from "motion/react";
 import { Button } from "@/components/ui/button";
 import NoProductFound from "@/components/layout/Products/NoProductFound";
 import ProductCard from "@/components/layout/Products/ProductCard";
@@ -94,9 +94,9 @@ const CategoryProducts = ({ categories, slug }: Props) => {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5">
             <AnimatePresence>
               {filteredProducts.map((p) => (
-                <motion.div key={p._id} layout>
+                <m.div key={p._id} layout>
                   <ProductCard product={p} />
-                </motion.div>
+                </m.div>
               ))}
             </AnimatePresence>
           </div>

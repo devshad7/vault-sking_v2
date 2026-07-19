@@ -1,20 +1,20 @@
 "use client";
 import { ShoppingCart } from "lucide-react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { emptyCart } from "@/public/Images/index";
 import Image from "next/image";
 
 export default function EmptyCart() {
   return (
     <div className="py-10 md:py-20 - from-blue-50 to-white flex items-center justify-center p-4">
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full space-y-8"
       >
-        <motion.div
+        <m.div
           animate={{
             scale: [1, 1.1, 1],
             rotate: [0, 5, -5, 0],
@@ -33,7 +33,7 @@ export default function EmptyCart() {
             objectFit="contain"
             className="drop-shadow-lg"
           />
-          <motion.div
+          <m.div
             animate={{
               x: [0, -10, 10, 0],
               y: [0, -5, 5, 0],
@@ -46,8 +46,8 @@ export default function EmptyCart() {
             className="absolute -top-4 -right-4 bg-blue-500 rounded-full p-2"
           >
             <ShoppingCart size={24} className="text-white" />
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
 
         <div className="text-center space-y-4">
           <h2 className="text-3xl font-bold text-gray-800">
@@ -67,7 +67,7 @@ export default function EmptyCart() {
             Discover Products
           </Link>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

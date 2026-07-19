@@ -1,3 +1,6 @@
+import { db } from "@/config/firebase.config";
+import { collection, getDocs } from "firebase/firestore";
+
 export type ProductImage = {
   src?: string;
   url?: string;
@@ -319,20 +322,6 @@ const brands: Brand[] = [
  
 ];
 
-const blogs: Blog[] = [
-  {
-    _id: "blog-1",
-    title: "How to build a simple skincare routine",
-    slug: { current: "how-to-build-a-simple-skincare-routine" },
-    mainImage:
-      "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
-    blogcategories: [{ title: "Routine" }],
-    publishedAt: "2026-06-10",
-    author: { name: "Asha" },
-    body: "A simple routine should focus on cleansing, hydration, and sun protection.",
-  },
-];
-
 const announcement: Announcement = {
   text: "Free shipping on orders over NPR 5,000",
   emoji: "✨",
@@ -387,33 +376,53 @@ export function getBrands(): Brand[] {
   return brands;
 }
 
-export function getAllBlogs(): Blog[] {
-  return blogs;
+export async function getAllBlogs(): Promise<Blog[]> {
+  const snapshot = await getDocs(collection(db, "blogs"));
+  return snapshot.docs.map((doc) => ({
+    ...(doc.data() as Omit<Blog, "_id">),
+    _id: doc.id,
+  }));
 }
 
-export function getLatestBlogs(): Blog[] {
-  return blogs.slice(0, 2);
+export async function getLatestBlogs(limitCount = 4): Promise<Blog[]> {
+  const blogs = await getAllBlogs();
+  return [...blogs]
+    .sort(
+      (a, b) =>
+        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
+    )
+    .slice(0, limitCount);
 }
 
-export function getSingleBlog(slug: string): Blog | undefined {
+export async function getSingleBlog(slug: string): Promise<Blog | undefined> {
+  const blogs = await getAllBlogs();
   return blogs.find((blog) => blog.slug.current === slug);
 }
 
-export function getOthersBlog(currentSlug: string, limit = 5): Blog[] {
+export async function getOthersBlog(
+  currentSlug: string,
+  limit = 5,
+): Promise<Blog[]> {
+  const blogs = await getAllBlogs();
   return blogs
     .filter((blog) => blog.slug.current !== currentSlug)
     .slice(0, limit);
 }
 
-export function getBlogCategories(): Array<{ title: string }> {
-  return blogs.flatMap((blog) => blog.blogcategories);
+export async function getBlogCategories(): Promise<Array<{ title: string }>> {
+  const blogs = await getAllBlogs();
+  const titles = new Set<string>();
+  blogs.forEach((blog) =>
+    blog.blogcategories?.forEach((c) => c.title && titles.add(c.title)),
+  );
+  return Array.from(titles).map((title) => ({ title }));
 }
 
 export function getActiveAnnouncement(): Announcement {
   return announcement;
 }
 
-export function getMyOrders(id: string): OrderItem[] {
+export function getMyOrders(): OrderItem[] {
   return orders;
 }
 

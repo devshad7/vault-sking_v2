@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import Container from "@/components/Container";
 import Title from "../Products/Title";
 
@@ -28,7 +28,7 @@ const Values = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {values.map((value, index) => (
-          <motion.div
+          <m.div
             key={value.title}
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -43,7 +43,7 @@ const Values = () => {
             <p className="text-sm text-text-muted leading-relaxed">
               {value.description}
             </p>
-          </motion.div>
+          </m.div>
         ))}
       </div>
     </Container>

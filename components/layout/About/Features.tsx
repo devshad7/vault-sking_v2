@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import Container from "@/components/Container";
 import { BadgeCheck, Truck, ShieldCheck, Headphones, HeartHandshake, Sparkles } from "lucide-react";
 
@@ -48,7 +48,7 @@ const Features = () => {
         {features.map((feature, index) => {
           const Icon = feature.icon;
           return (
-            <motion.div
+            <m.div
               key={feature.title}
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -63,7 +63,7 @@ const Features = () => {
               <p className="text-sm text-text-muted leading-relaxed">
                 {feature.description}
               </p>
-            </motion.div>
+            </m.div>
           );
         })}
       </div>
